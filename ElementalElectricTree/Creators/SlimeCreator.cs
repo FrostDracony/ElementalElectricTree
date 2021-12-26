@@ -1,281 +1,90 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SRML.SR;
 using SRML.Utils;
 using UnityEngine;
-using UnityEngine.ParticleSystemJobs;
 using Console = SRML.Console.Console;
 using ElementalElectricTree;
 using ElementalElectricTree.Other;
+using MonomiPark.SlimeRancher.Regions;
 
 namespace Creators
 {
     class Custom_Slime_Creator
     {
-        unsafe public static void CreateNewElectricSlime(ReactToShock reactToShock1, ReactToShock reactToShock2)
+        public static void RegisterSlime((SlimeDefinition, GameObject) Tuple)
         {
-            GameObject ElectricSlime = SRBehaviour.InstantiateActor(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.ELECTRIC_SLIME), reactToShock1.regionMember.setId, reactToShock1.transform.position, reactToShock1.transform.rotation);
-            MeshFilter ElectricParticles = GameObject.Instantiate<MeshFilter>(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1).GetComponentsInChildren<MeshFilter>(true).First((MeshFilter x) => x.name == "Core Sphere")); //SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1).GetComponentInChildren<DestroyAndShockOnTouching>().destroyFX;
-            GameObject ElectricSounds = SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1).GetComponentInChildren<DestroyAndShockOnTouching>().destroyFX;
 
-            SRBehaviour.SpawnAndPlayFX(ElectricSounds, ElectricSlime, ElectricSlime.transform.position, ElectricSlime.transform.rotation);
+            //Getting the SlimeDefinition and GameObject separated
+            SlimeDefinition Slime_Slime_Definition = Tuple.Item1;
+            GameObject Slime_Slime_Object = Tuple.Item2;
 
-            Vector3 targetPosition = SRSingleton<SceneContext>.Instance.Player.transform.position + new Vector3(0, 0.5F, 0);
-            Abilities.CreateShoot(reactToShock1.gameObject.transform.position + new Vector3(0, 3, 0), targetPosition - (reactToShock1.gameObject.transform.position + new Vector3(0, 3, 0)), reactToShock1.regionMember.setId);
+            //And well, registering it!
 
-            //ElectricSlime.AddComponent<ShockOnTouch>();
+            LookupRegistry.RegisterIdentifiablePrefab(Slime_Slime_Object);
+            SlimeRegistry.RegisterSlimeDefinition(Slime_Slime_Definition);
 
-            GameObject.Destroy(reactToShock1.gameObject);
-            GameObject.Destroy(reactToShock2.gameObject);
+            AmmoRegistry.RegisterAmmoPrefab(PlayerState.AmmoMode.DEFAULT, Slime_Slime_Object);
+            AmmoRegistry.RegisterAmmoPrefab(PlayerState.AmmoMode.NIMBLE_VALLEY, Slime_Slime_Object);
+
+            SlimeDefinition slimeByIdentifiableId = SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.TARR_SLIME);
+            slimeByIdentifiableId.Diet.EatMap.Add(new SlimeDiet.EatMapEntry
+            {
+                eats = Slime_Slime_Definition.IdentifiableId,
+                becomesId = Identifiable.Id.NONE,
+                driver = SlimeEmotions.Emotion.NONE,
+                producesId = Identifiable.Id.NONE
+            });
 
         }
 
-        unsafe public static void CreateElectricSlime(ReactToShock reactToShock)
+        unsafe public static (SlimeDefinition, GameObject) CreatPlasmaSlimePrefab(bool autoRegister = true)
         {
-            GameObject ElectricSlime = SRBehaviour.InstantiateActor(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.ELECTRIC_SLIME), reactToShock.regionMember.setId, reactToShock.transform.position, reactToShock.transform.rotation);
-            MeshFilter ElectricParticles = GameObject.Instantiate<MeshFilter>(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1).GetComponentsInChildren<MeshFilter>(true).First((MeshFilter x) => x.name == "Core Sphere")); //SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1).GetComponentInChildren<DestroyAndShockOnTouching>().destroyFX;
-            GameObject ElectricSounds = SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1).GetComponentInChildren<DestroyAndShockOnTouching>().destroyFX;
 
-            SRBehaviour.SpawnAndPlayFX(ElectricSounds, ElectricSlime, ElectricSlime.transform.position, ElectricSlime.transform.rotation);
-            //ElectricParticles.gameObject.transform.parent = ElectricSlime.transform;
-            Vector3 targetPosition = SRSingleton<SceneContext>.Instance.Player.transform.position + new Vector3(0, 0.5F, 0);
-            Abilities.CreateShoot(reactToShock.gameObject.transform.position + new Vector3(0, 3, 0), targetPosition - (reactToShock.gameObject.transform.position + new Vector3(0, 3, 0)), reactToShock.regionMember.setId);
+            (SlimeDefinition, GameObject) SlimeTuple = CreateSlime(
+                Ids.PLASMA_SLIME,
+                "plasmaSlime",
+                new SlimeEat.FoodGroup[1]
+                {
+                    SlimeEat.FoodGroup.FRUIT
+                },
 
-            //ElectricSlime.AddComponent<ShockOnTouch>();
+                new Identifiable.Id[1]
+                {
+                    Identifiable.Id.NONE
+                },
+                new Identifiable.Id[1]
+                {
+                    Identifiable.Id.NONE
+                },
+                Main.assetBundle.LoadAsset<Sprite>("PlasmaSlime"),
+                new SlimeAppearance.Palette
+                {
+                    Top = Color.magenta,
+                    Middle = Color.magenta,
+                    Bottom = Color.magenta
+                },
+                Color.magenta,
+                Identifiable.Id.PINK_SLIME,
+                autoRegister);
 
-            //ElectricSlime.AddComponent<ShockOnTouch>();
-            
+            SlimeDefinition slimeDefinition = SlimeTuple.Item1;
+            GameObject slimeObject = SlimeTuple.Item2;
+            SlimeAppearance slimeAppearance = slimeObject.GetComponent<SlimeAppearanceApplicator>().Appearance;
 
-            GameObject.Destroy(reactToShock.gameObject);
-        }
-
-        unsafe public static (SlimeDefinition, GameObject) CreateSlime(Identifiable.Id SlimeId, string SlimeName)
-        {
-            SlimeDefinition quicksilverSlimeDefinition = SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME);
-            SlimeDefinition goldSlimeDefinition = SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.GOLD_SLIME);
-            
-            SlimeDefinition slimeDefinition = (SlimeDefinition)PrefabUtils.DeepCopyObject(quicksilverSlimeDefinition);
-            slimeDefinition.AppearancesDefault = new SlimeAppearance[1];
-            slimeDefinition.Diet.Produces = new Identifiable.Id[1]
-            {
-                Identifiable.Id.NONE
-            };
-
-            slimeDefinition.Diet.MajorFoodGroups = new SlimeEat.FoodGroup[2]
-            {
-                SlimeEat.FoodGroup.MEAT,
-                SlimeEat.FoodGroup.FRUIT,
-            };
-
-            slimeDefinition.Diet.AdditionalFoods = new Identifiable.Id[0];
-
-            slimeDefinition.Diet.Favorites = new Identifiable.Id[1]
-            {
-                Identifiable.Id.NONE
-            };
-
-            slimeDefinition.Diet.EatMap?.Clear();
-
-            slimeDefinition.CanLargofy = false;
-            slimeDefinition.FavoriteToys = new Identifiable.Id[0];
-            slimeDefinition.Name = SlimeName;
-            slimeDefinition.IdentifiableId = SlimeId;
-
-            GameObject slimeObject = PrefabUtils.CopyPrefab(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.QUICKSILVER_SLIME));
-            slimeObject.name = SlimeName;
-            slimeObject.GetComponent<PlayWithToys>().slimeDefinition = slimeDefinition;
-            slimeObject.GetComponent<SlimeAppearanceApplicator>().SlimeDefinition = slimeDefinition;
-            slimeObject.GetComponent<SlimeEat>().slimeDefinition = slimeDefinition;
-            slimeObject.GetComponent<Identifiable>().id = SlimeId;
-            //UnityEngine.Object.Destroy(slimeObject.GetComponent<PinkSlimeFoodTypeTracker>());
-
-            //Console.Log("starting printing hierarchy");
-
-            /*foreach (Component component in SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1).GetComponentsInChildren<Component>(true))
-            {
-                Console.Log("   " + component.ToString());
-            }*/
-
-
-
-            //Console.Log("");
-            //Console.Log("");
-
-            //SlimeAppearance slimeAppearance = slimeDefinition.AppearancesDefault[0];
-            SlimeAppearance slimeAppearance = (SlimeAppearance)PrefabUtils.DeepCopyObject(quicksilverSlimeDefinition.AppearancesDefault[0]);
-            //SlimeAppearance slimeAppearance = UnityEngine.Object.Instantiate(quicksilverSlimeDefinition.AppearancesDefault[0]);
-            slimeDefinition.AppearancesDefault[0] = slimeAppearance;
             SlimeAppearanceStructure[] structures = slimeAppearance.Structures;
-            ////SRSingleton<GameContext>.Instance.OptionsDirector.mode;
-            //SRQualitySettings.
-            //Console.Log(structures.ToArray().ToString());
+            Material material = UnityEngine.Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.PINK_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
 
-            
-
-            int i = 0; //1 = Body, 2 = crest
-            int i2 = 0;
+            material.shader.PrintContent();
 
             foreach (SlimeAppearanceStructure slimeAppearanceStructure in structures)
             {
-                //Console.Log(slimeAppearanceStructure.ToString());
                 Material[] defaultMaterials = slimeAppearanceStructure.DefaultMaterials;
                 if (defaultMaterials != null && defaultMaterials.Length != 0)
-                { //ElectricSlimeBody and BoldCrest
-                    //Console.Log("Printing Structures stuff");
-                    
-                    foreach (SlimeAppearanceObject prefab in slimeAppearanceStructure.Element.Prefabs)
-                    {
-                        GameObject gameObject = prefab.gameObject;
-
-                        var returnvalue = prefab.gameObject.PrintParent();
-                        if (returnvalue != null)
-                            returnvalue.PrintParent();
-
-                        if (prefab.name.Contains("quickSilverCrest") == true)
-                        {
-
-                            if (gameObject.TryGetComponent<MeshFilter>(out MeshFilter filter))
-                            {
-                                //Console.Log("   Filter: " + filter.ToString());
-                                filter.sharedMesh = Main.assetBundle.LoadAsset<GameObject>("BoldCrest").GetComponentInChildren<MeshFilter>(true).sharedMesh;
-                            }
-
-                            if (gameObject.TryGetComponent<SkinnedMeshRenderer>(out SkinnedMeshRenderer skinned))
-                            {
-                                //Console.Log("   Skinned: " + skinned.ToString());
-                                skinned.sharedMesh = Main.assetBundle.LoadAsset<GameObject>("BoldCrest").GetComponentInChildren<MeshFilter>(true).sharedMesh;
-                            }
-
-                        }
-                    }
-
-
-                    /*foreach (SlimeAppearanceObject prefab in slimeAppearanceStructure.Element.Prefabs)
-                    {
-                        GameObject gameObject = prefab.gameObject;
-                        string mesh = prefab.name.Contains("quickSilverCrest") ? "BoldCrest" : "ElectricSlimeBody"; //CrestWithBold + BoldCrest
-                        prefab.IgnoreLODIndex = true;
-                        Console.Log("");
-                        Console.Log("");
-                        Console.Log(mesh);
-                        Console.Log("Logging Prefab: " + prefab.name + " with LOD of: " + prefab.LODIndex + " ignore: " + prefab.IgnoreLODIndex);
-                        Console.Log("Prefab has as components: ");
-
-                        foreach (Component component in gameObject.GetComponentsInChildren<Component>(true))
-                        {
-                            Console.Log("   " + component.ToString());
-                        }
-
-                        Console.Log("");
-                        Console.Log("");
-                        Console.Log("Get all meshes:");
-
-                        foreach (MeshFilter component in gameObject.GetComponentsInChildren<MeshFilter>(true))
-                        {
-                            Console.Log("   " + component.ToString());
-                        }
-
-                        Console.Log("");
-                        Console.Log("");
-
-                        foreach (SlimeAppearanceObject component in gameObject.GetComponentsInChildren<SlimeAppearanceObject>(true))
-                        {
-                            Console.Log("SlimeAppearanceobject: ");
-                            Console.Log("   " + component.ToString());
-                            component.gameObject.PrintComponent();
-                        }
-
-                        Console.Log("");
-                        Console.Log("");
-
-                        *//*if (gameObject.TryGetComponent<MeshFilter>(out MeshFilter filter))
-                        {
-                            Console.Log("   Filter: " + filter.ToString());
-
-                            if (prefab.LODIndex == 0 || prefab.LODIndex == 1)
-                            {
-                                filter.sharedMesh = Main.assetBundle.LoadAsset<GameObject>(mesh).GetComponentInChildren<MeshFilter>(true).sharedMesh;
-                            }
-
-                        }
-
-                        if (gameObject.TryGetComponent<SkinnedMeshRenderer>(out SkinnedMeshRenderer skinned))
-                        {
-                            if (prefab.LODIndex == 0 || prefab.LODIndex == 1)
-                            {
-                                skinned.sharedMesh = Main.assetBundle.LoadAsset<GameObject>(mesh).GetComponentInChildren<MeshFilter>(true).sharedMesh;
-                            }
-                        }*//*
-
-                        if (prefab.name.Contains("quickSilverCrest") == true || prefab.name.Contains("slime_quickSilver") == true || prefab.name.Contains("slime_default"))
-                        {
-
-                            *//*if(mesh == "BoldCrest")
-                            {
-                                prefab.name = "BoldCrest";
-                            }
-                            else
-                            {
-                                prefab.name = "ElectricSlimeBody";
-                            }*//*
-
-                            Console.Log("");
-                            Console.Log("");
-                            Console.Log("");
-                            Console.Log("mesh" + mesh + " prefab name: " + prefab.name);
-                            Console.Log("prefab Contains quickSilverCrest:  " + prefab.name.Contains("quickSilverCrest"));
-                            Console.Log("prefab Contains slime_quickSilver:  " + prefab.name.Contains("slime_quickSilver"));
-
-                            *//*foreach (Component component in gameObject.GetComponentsInChildren<Component>(true))
-                            {
-                                Console.Log("   " + component.ToString());
-                            }*//*
-
-                            if (gameObject.TryGetComponent<MeshFilter>(out MeshFilter filter))
-                            {
-                                Console.Log("   Filter: " + filter.ToString());
-
-                                *//*if (prefab.LODIndex == 0 || prefab.LODIndex == 1)
-                                {
-                                    filter.sharedMesh = Main.assetBundle.LoadAsset<GameObject>(mesh).GetComponentInChildren<MeshFilter>(true).sharedMesh;
-                                }*//*
-                                filter.sharedMesh = Main.assetBundle.LoadAsset<GameObject>(mesh).GetComponentInChildren<MeshFilter>(true).sharedMesh;
-
-
-                            }
-
-                            if (gameObject.TryGetComponent<SkinnedMeshRenderer>(out SkinnedMeshRenderer skinned))
-                            {
-                                *//*if (prefab.LODIndex == 0 || prefab.LODIndex == 1)
-                                {
-                                    skinned.sharedMesh = Main.assetBundle.LoadAsset<GameObject>(mesh).GetComponentInChildren<MeshFilter>(true).sharedMesh;
-                                }*//*
-                                skinned.sharedMesh = Main.assetBundle.LoadAsset<GameObject>(mesh).GetComponentInChildren<MeshFilter>(true).sharedMesh;
-
-                            }
-
-                        }
-                    }*/
-                    //Console.Log("");
-                    //Console.Log("");
-                    //Console.Log("Finished Printing");
-                }
-
-                Material material = UnityEngine.Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.GOLD_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
-                Material material2 = UnityEngine.Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.BOOM_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
-                SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.BOOM_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials.PrintContent();
-                SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.BOOM_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0].shader.PrintContent();
-                Material silver_material = UnityEngine.Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
-
-                //Console.Log("   I = " + i);
-
-                if (i == 0)
                 {
+                    material.SetColor("_TopColor", new Color32(190, 28, 255, 255));
+                    material.SetColor("_MiddleColor", new Color32(159, 28, 255, 255));
+                    material.SetColor("_BottomColor", new Color32(120, 28, 255, 255));
+                    material.SetColor("_SpecColor", new Color32(205, 28, 255, 255));
 
-                    //Console.Log(material.shader.name);
-                    material.SetTexture(Shader.PropertyToID("_CubemapOverride"), Main.assetBundle.LoadAsset<Texture>("electric_sphere_1"));
                     material.SetFloat(Shader.PropertyToID("_Gloss"), 3.5F);
                     material.SetFloat(Shader.PropertyToID("_GlossPower"), 6F);
                     material.SetFloat(Shader.PropertyToID("_Shininess"), 2F);
@@ -284,41 +93,137 @@ namespace Creators
 
                     slimeAppearanceStructure.DefaultMaterials[0] = material;
                 }
-                else
-                {
-                    material.SetFloat("_Shininess", 15f);
-                    material.SetFloat("_Gloss", 10f);
-                    slimeAppearanceStructure.DefaultMaterials[0] = material;
-                }
 
-                i++;
             }
 
-            //Console.Log("Slime Created");
-            slimeAppearance.Icon = Main.assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
-
-            slimeAppearance.ColorPalette = new SlimeAppearance.Palette
+            SlimeExpressionFace[] expressionFaces = slimeAppearance.Face.ExpressionFaces;
+            for (int k = 0; k < expressionFaces.Length; k++)
             {
-                Top = Color.yellow,
-                Middle = Color.yellow,
-                Bottom = Color.yellow
-            };
+                SlimeExpressionFace slimeExpressionFace = expressionFaces[k];
+                if ((bool)slimeExpressionFace.Mouth)
+                {
+                    slimeExpressionFace.Mouth.SetColor("_MouthBot", new Color32(205, 190, 255, 255));
+                    slimeExpressionFace.Mouth.SetColor("_MouthMid", new Color32(182, 170, 226, 255));
+                    slimeExpressionFace.Mouth.SetColor("_MouthTop", new Color32(182, 170, 205, 255));
+                }
+                if ((bool)slimeExpressionFace.Eyes)
+                {
+                    slimeExpressionFace.Eyes.SetColor("_EyeRed", new Color32(205, 190, 255, 255));
+                    slimeExpressionFace.Eyes.SetColor("_EyeGreen", new Color32(182, 170, 226, 255));
+                    slimeExpressionFace.Eyes.SetColor("_EyeBlue", new Color32(182, 170, 205, 255));
+                }
+            }
+            slimeAppearance.Face.OnEnable();
 
-            slimeAppearance.ColorPalette.Ammo = Color.yellow;
 
-            slimeObject.GetComponent<SlimeAppearanceApplicator>().Appearance = slimeAppearance;
-            //Console.Log("Slime Created");
             slimeObject.AddComponent<ShockOnTouch>();
             slimeObject.AddComponent<ShootWhenAgitated>();
+            slimeObject.AddComponent<DamagePlayerOnTouch>().GetCopyOf(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.ROCK_SLIME).GetComponentInChildren<DamagePlayerOnTouch>());
 
-            slimeObject.GetComponent<DamagePlayerOnTouch>().damagePerTouch = 70;
-            slimeObject.GetComponent<PuddleSlimeScoot>().straightlineForceFactor *= 300;
+            slimeObject.GetComponent<DamagePlayerOnTouch>().damagePerTouch = 140;
 
-            slimeObject.AddComponent<SlimeRandomMove>().GetCopyOf(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.PINK_SLIME).GetComponentInChildren<SlimeRandomMove>());
+            slimeObject.GetComponent<SlimeRandomMove>().scootSpeedFactor *= 6;
+            slimeObject.GetComponent<SlimeRandomMove>().verticalFactor *= 3;
 
-            GameObject.Destroy(slimeObject.GetComponent(typeof(SlimeFlee)));
-            GameObject.Destroy(slimeObject.GetComponent(typeof(FollowWaypoints)));
-            GameObject.Destroy(slimeObject.GetComponent(typeof(ReactToShock)));
+            GameObject.Destroy(slimeObject.GetComponent(typeof(PinkSlimeFoodTypeTracker)));
+
+            return (slimeDefinition, slimeObject);
+        }
+
+        unsafe public static void CreateElectricSlime(ReactToShock quickSilverSlime, ReactToShock goldSlime, SlimeAppearance shocked)
+        {
+            Console.Log("Quicksilver position: " + quickSilverSlime.gameObject.transform.position);
+            Console.Log("GoldSlime position: " + goldSlime.gameObject.transform.position);
+
+            Vector3 Position = Vector3.Lerp(quickSilverSlime.gameObject.transform.position, goldSlime.gameObject.transform.position, 0.5F);
+            Console.Log("FinalPosition: " + Position);
+            if (quickSilverSlime.GetPrivateField<RegionMember>("regionMember").setId == RegionRegistry.RegionSetId.VALLEY)
+            {
+                //SRBehaviour.InstantiateActor(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.ELECTRIC_SLIME), GameObject.FindObjectOfType<WeaponVacuum>().GetPrivateField<RegionRegistry>("regionRegistry").GetCurrentRegionSetId(), Position, Quaternion.identity, false);
+                
+                GameObject ElectricSlime = SRBehaviour.InstantiateActor(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.ELECTRIC_SLIME), SceneContext.Instance.Player.GetComponent<RegionMember>().setId, true);
+                ElectricSlime.transform.position = Position;
+            }
+            else
+            {
+                GameObject ElectricSlime = SRBehaviour.InstantiateActor(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.FORM_2_ELECTRIC_SLIME), SceneContext.Instance.Player.GetComponent<RegionMember>().setId, true);
+                ElectricSlime.transform.position = Position;
+                
+                //SRBehaviour.InstantiateActor(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.FORM_2_ELECTRIC_SLIME), GameObject.FindObjectOfType<WeaponVacuum>().GetPrivateField<RegionRegistry>("regionRegistry").GetCurrentRegionSetId(), Position, Quaternion.identity, false);
+            }
+            Vector3 targetPosition = SRSingleton<SceneContext>.Instance.Player.transform.position + new Vector3(0, 0.5F, 0);
+            Abilities.CreateShoot(Position + new Vector3(0, 3, 0), targetPosition - (Position + new Vector3(0, 3, 0)), quickSilverSlime.GetPrivateField<RegionMember>("regionMember").setId);
+
+            Destroyer.DestroyActor(quickSilverSlime.gameObject, "transforming to electric slime");
+            Destroyer.DestroyActor(goldSlime.gameObject, "transforming to electric slime");
+        }
+
+        /*unsafe public static void CreateElectricSlime(ReactToShock reactToShock)
+        {
+            try
+            {
+                Console.Log(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.QUICKSILVER_SLIME).GetComponentInChildren<SlimeAppearanceApplicator>().Appearance + " Appearance really exists!");
+                Console.Log(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.QUICKSILVER_SLIME).GetComponentInChildren<SlimeAppearanceApplicator>().Appearance.ShockedAppearance + " Shocked Appearance really exists!");
+            }
+            catch (Exception)
+            {
+
+                Console.Log("nope, no shocked appearance nor normal appearance...");
+            }
+
+            GameObject ElectricSlime = SRBehaviour.InstantiateActor(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.ELECTRIC_SLIME), reactToShock.GetPrivateField<RegionMember>("regionMember").setId, reactToShock.transform.position, reactToShock.transform.rotation);
+            GameObject ElectricSounds = SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1).GetComponentInChildren<DestroyAndShockOnTouching>().destroyFX;
+
+            SRBehaviour.SpawnAndPlayFX(ElectricSounds, ElectricSlime, ElectricSlime.transform.position, ElectricSlime.transform.rotation);
+            Vector3 targetPosition = SRSingleton<SceneContext>.Instance.Player.transform.position + new Vector3(0, 0.5F, 0);
+            Abilities.CreateShoot(reactToShock.gameObject.transform.position + new Vector3(0, 3, 0), targetPosition - (reactToShock.gameObject.transform.position + new Vector3(0, 3, 0)), reactToShock.GetPrivateField<RegionMember>("regionMember").setId);
+
+
+            GameObject.Destroy(reactToShock.gameObject);
+        }*/
+
+        unsafe public static (SlimeDefinition, GameObject) CreateSlime(Identifiable.Id SlimeId, string SlimeName, SlimeEat.FoodGroup[] foodGroup, Identifiable.Id[] produces, Identifiable.Id[] favorites, Sprite icon, SlimeAppearance.Palette spashColor, Color inventoryColor, Identifiable.Id slimeObjectToUse, bool autoRegister)
+        {
+            SlimeDefinition slimeDefinitionToUse = SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(slimeObjectToUse);
+            
+            SlimeDefinition slimeDefinition = (SlimeDefinition)PrefabUtils.DeepCopyObject(slimeDefinitionToUse);
+            slimeDefinition.AppearancesDefault = new SlimeAppearance[1];
+            slimeDefinition.Diet.Produces = produces;
+
+            slimeDefinition.Diet.MajorFoodGroups = foodGroup;
+
+            slimeDefinition.Diet.AdditionalFoods = new Identifiable.Id[0];
+
+            slimeDefinition.Diet.Favorites = favorites;
+
+            slimeDefinition.Diet.EatMap?.Clear();
+
+            slimeDefinition.CanLargofy = false;
+            slimeDefinition.FavoriteToys = new Identifiable.Id[0];
+            slimeDefinition.Name = SlimeName;
+            slimeDefinition.IdentifiableId = SlimeId;
+
+            GameObject slimeObject = PrefabUtils.CopyPrefab(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(slimeObjectToUse));
+            slimeObject.name = SlimeName;
+            slimeObject.GetComponent<PlayWithToys>().slimeDefinition = slimeDefinition;
+            slimeObject.GetComponent<SlimeAppearanceApplicator>().SlimeDefinition = slimeDefinition;
+            slimeObject.GetComponent<SlimeEat>().slimeDefinition = slimeDefinition;
+            slimeObject.GetComponent<Identifiable>().id = SlimeId;
+            if (slimeObject.GetComponent<PinkSlimeFoodTypeTracker>())
+                GameObject.Destroy(slimeObject.GetComponent<PinkSlimeFoodTypeTracker>());
+
+            SlimeAppearance slimeAppearance = (SlimeAppearance)PrefabUtils.DeepCopyObject(slimeDefinitionToUse.AppearancesDefault[0]);
+            slimeDefinition.AppearancesDefault[0] = slimeAppearance;
+
+            LookupRegistry.RegisterVacEntry(SlimeId, inventoryColor, icon);
+
+            slimeAppearance.Icon = icon;
+
+            slimeAppearance.ColorPalette = spashColor;
+
+            slimeAppearance.ColorPalette.Ammo = inventoryColor;
+
+            slimeObject.GetComponent<SlimeAppearanceApplicator>().Appearance = slimeAppearance;
 
             return (slimeDefinition, slimeObject);
         }

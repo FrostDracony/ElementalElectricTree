@@ -1,0 +1,49 @@
+﻿#=====================================
+# Elemental Electricity Tree
+#=====================================
+
+# Slimes
+actor:l.electric_slime: Elektrischer Slime (Form 1)
+actor:l.form_2_electric_slime: Elektrischer Slime (Form 2)
+
+actor:l.plasma_slime: Plasma Slime
+
+# Pedia
+
+# Electric Slime (Form 1)
+pedia:t.electric_slime_entry: Elektrischer Slime (Form 1)
+pedia:m.intro.electric_slime_entry: Ein gefährlicher Slime mit hohes Volt, pass auf!
+pedia:m.diet.electric_slime_entry: Gemüse, Frucht und Fleisch
+pedia:m.favorite.electric_slime_entry: Elektriche Hünchen
+pedia:m.slimeology.electric_slime_entry: Dieser Slime ist wirklich geheimnisvoll. Er scheint eine hohe Konzentration von Elektrizität auszustoßen, und wenn er wütend wird, kann er seine ganze Energie in einem einzigen, einzigartigen elektrischen Ball konzentrieren, der wahrscheinlich der tödlichste Schuss ist, den ein Slime machen kann! Sie scheinen aus reiner Elektrizität zu bestehen, denn sie reagierten auf alle elektrischen Tests, die wir mit ihnen gemacht haben. Und sie müssen mächtig sein, denn sie können Quecksilber schocken! Solch ein Slime wurde noch nie zuvor gesehen, und seine Form lässt vermuten, dass es sich um einen der Vorfahren der Quecksilber handelt! Dann scheint er auf die Energie des Energiereaktors im Nimble Valley zu reagieren, so dass er, wenn er dort ist, die Form eines pfeilförmigen Slimes annimmt, auch "Quecksilber-Form" genannt. In dieser Form ist der Slime viel schneller als seine Artgenossen, die Quecksilber-Slime, kann höher springen und hat eine zusätzliche Fähigkeit, in der er sich in einen elektrischen Pfeil verwandelt, dies ist eines der größten Geheimnisse der Evolution! Wer weiß, wie viele Geheimnisse er von ihm und seinen Ursprüngen lernen kann...
+pedia:m.risks.electric_slime_entry: Wegen der ganzen Elektrizität kann das Berühren dieses Slime den Rancher verletzen und, wenn man Pech hat, sogar einen Elektroschock verursachen (die gleichen Effekte wie bei Betäubung, nur dass man mehr Zeit braucht, um sich zu erholen und er sich nicht sofort erholt). Dieser Schleim kann extrem starke Elektroschockkugeln auf den Rancher schießen, die man unbedingt vermeiden sollte (WIP In Zukunft wird er auch Korrals deaktivieren können, also überlegt euch gut, wo ihr ihn platziert)!")
+pedia:m.plortonomics.electric_slime_entry: ???
+
+# Electric Slime (Form 2)
+pedia:t.form_2_electric_slime_entry: Elektrischer Slime (Form 2)
+pedia:m.intro.form_2_electric_slime_entry: Ein gefährlicher Slime mit hohes Volt, pass auf!
+pedia:m.diet.form_2_electric_slime_entry: Gemüse und Hünchen
+pedia:m.favorite.form_2_electric_slime_entry: Elektriche Hünchen
+pedia:m.slimeology.form_2_electric_slime_entry: Dieser Slime ist wirklich geheimnisvoll. Er scheint eine hohe Konzentration von Elektrizität auszustoßen, und wenn er wütend wird, kann er seine ganze Energie in einem einzigen, einzigartigen elektrischen Ball konzentrieren, der wahrscheinlich der tödlichste Schuss ist, den ein Slime machen kann! Sie scheinen aus reiner Elektrizität zu bestehen, denn sie reagierten auf alle elektrischen Tests, die wir mit ihnen gemacht haben. Und sie müssen mächtig sein, denn sie können Quecksilber schocken! Einen solchen Slime haben wir noch nie gesehen, und seine Form lässt vermuten, dass es sich um einen der Vorfahren der Quecksilber handelt! Dann scheinen sie auf die Energie des Energiereaktors im Nimble Valley zu reagieren, so dass sie, wenn sie nicht dort sind, die Form eines normalen Slime annehmen. In dieser Form ist der Slime viel langsamer als seine Artgenossen, die Quecksilber-Slime, aber er kann höher springen und hat mächtigere Angriffe, um sich zu verteidigen, wie z.B. das Erzeugen eines einzigen, großen "Kanonenschusses", das Erzeugen einer Schockwelle, die jedes Lebewesen in der Nähe durch Stromschlag tötet, das Deaktivieren von Korallen und vieles mehr, was wir noch wissen müssen, Dies ist eines der größten Geheimnisse der Evolution! Wer weiß, wie viele Geheimnisse er aus ihr und ihren Ursprüngen lernen kann...
+pedia:m.risks.form_2_electric_slime_entry: Wegen der ganzen Elektrizität kann das Berühren dieses Slime den Rancher verletzen und, wenn man Pech hat, sogar einen Elektroschock verursachen (die gleichen Effekte wie bei Betäubung, nur dass man mehr Zeit braucht, um sich zu erholen und er sich nicht sofort erholt). Dieser Schleim kann extrem starke Elektroschockkugeln auf den Rancher schießen, die man unbedingt vermeiden sollte (WIP In Zukunft wird er auch Korrals deaktivieren können, also überlegt euch gut, wo ihr ihn platziert)!")
+pedia:m.plortonomics.form_2_electric_slime_entry: ???
+
+# Plasma Slime
+pedia:t.plasma_slime_entry: Plasma Slime
+pedia:m.intro.plasma_slime_entry: Ein gefährlicher Slime mit hohes Volt, pass auf!
+pedia:m.diet.plasma_slime_entry: Gemüse, Frucht und Fleisch
+pedia:m.favorite.plasma_slime_entry: Elektriche Hünchen
+pedia:m.slimeology.plasma_slime_entry: Dieser Schleim ist wirklich geheimnisvoll. Er scheint eine hohe Konzentration von Elektrizität auszustrahlen, und wenn er wütend wird, kann er seine ganze Energie in einem einzigen, einzigartigen elektrischen Ball konzentrieren, der wahrscheinlich der tödlichste Schuss ist, den ein Schleim machen kann! Sie scheinen aus reiner Elektrizität zu bestehen, denn sie reagierten auf alle elektrischen Tests, die wir mit ihnen gemacht haben. Und sie müssen mächtig sein, denn sie können Quecksilber schocken! Solch ein Schleim wurde noch nie gesehen, und durch seine Form können wir annehmen, dass er einer der Vorfahren der Quecksilbers ist! Wer weiß, wie viele Geheimnisse er von ihm und seinen Ursprüngen lernen kann...
+pedia:m.risks.plasma_slime_entry: Wegen der ganzen Elektrizität kann das Berühren dieses Slime den Rancher verletzen und, wenn man Pech hat, sogar einen Elektroschock verursachen (die gleichen Effekte wie bei Betäubung, nur dass man mehr Zeit braucht, um sich zu erholen und er sich nicht sofort erholt). Dieser Schleim kann extrem starke Elektroschockkugeln auf den Rancher schießen, die man unbedingt vermeiden sollte (WIP In Zukunft wird er auch Korrals deaktivieren können, also überlegt euch gut, wo ihr ihn platziert)!")
+pedia:m.plortonomics.plasma_slime_entry: ???
+
+# Food
+actor:l.electric_hen: Elektrischer Huhn
+actor:l.electric_rooster: Elektrischer Roostro
+
+# Plorts
+actor:l.electric_plort: Elektrischer-Plort
+
+# Upgrades
+pedia:m.upgrade.name.corral.electrometer : "ElectroMeter"
+pedia:m.upgrade.desc.corral.electrometer : "A reguator, created from Mochi that allows a rancher to..."

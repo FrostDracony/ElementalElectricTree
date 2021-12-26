@@ -1,0 +1,50 @@
+﻿#=====================================
+# Elemental Electricity Tree
+#=====================================
+
+# Slimes
+actor:l.electric_slime: Electric Slime (Form 1)
+actor:l.form_2_electric_slime: Electric Slime (Form 2)
+actor:l.secret_style_electric_slime: Blue Electric Slime
+
+actor:l.plasma_slime: Plasma  Slime
+
+# Pedia
+
+# Electric Slime (Form 1)
+pedia:t.electric_slime_entry: Electric Slime (Form 1)
+pedia:m.intro.electric_slime_entry: An dangerous slime with a dangerous high volt, watch out! This is the native form of the electric slimes.
+pedia:m.diet.electric_slime_entry: Veggies, Fruits and Meat
+pedia:m.favorite.electric_slime_entry: Electric Veggies/Fruits/Meat
+pedia:m.slimeology.electric_slime_entry: This slime is really mysterious. It seems to emmit a high concentration of electricity, and when it gets angry it can concentrate all his energy in one, unique electric ball that is probably the deadliest shoot a slime can do! They seem to be made out of pure electricity, because they reacted to all electricity tests we made with them. And they have to be powerfull, because they can shock quicksilvers! Such a slime was never be seen before, and by its form we can think it's one of the ancestors of the quicksilvers! Then, it seem to react to the energy of the energy reactor in the Nimble Valley, so when they are there, they take the form of a arrowshaped slime, also called "Quicksilver form". In this form the slime is way faster than it's cousins, the Quicksilver slimes, can jump higher and has 1 extra ability, in wich it transforms itself into a electricity arrow, this is one of the biggest mysteries of evolution! Who knows how many secrets he can learn from it and it's origins...
+pedia:m.risks.electric_slime_entry: Because of all the electricity, touching this slime can hurt the rancher and, if you are unlucky, even electroshocking you (the same effects of beign stunned, only that you need more time to recover and it dosen't recover immediately). This slime can shoot extrelmy powerfull electroshock balls to the rancher, to avoid at all costs (WIP In the future it will be able to disable corrals, so think twice where you place it)!")
+pedia:m.plortonomics.electric_slime_entry: A good energy source that can be used to create new types of advanced machines, Mochi and Viktor and their new machines are the perfect example for it. But how exactly this plort works is unknown to us. It seems to contain the essence of a lightning tells us Thora
+
+# Electric Slime (Form 2)
+pedia:t.form_2_electric_slime_entry: Electric Slime (Form 2)
+pedia:m.intro.form_2_electric_slime_entry: An dangerous slime with a dangerous high volt, watch out! This is the morphed, adapted form of the electric slimes.
+pedia:m.diet.form_2_electric_slime_entry: Veggies, Fruits and Meat
+pedia:m.favorite.form_2_electric_slime_entry: Electric Veggies/Fruits/Meat
+pedia:m.slimeology.form_2_electric_slime_entry: This slime is really mysterious. It seems to emmit a high concentration of electricity, and when it gets angry it can concentrate all his energy in one, unique electric ball that is probably the deadliest shoot a slime can do! They seem to be made out of pure electricity, because they reacted to all electricity tests we made with them. And they have to be powerfull, because they can shock quicksilvers! Such a slime was never be seen before, and by its form we can think it's one of the ancestors of the quicksilvers! Then, they seem to react to the energy of the energy reactor in the Nimble Valley, so when they aren't there, they take the form of a normal slime. In this form the slime is way slower than it's cousins, the Quicksilver slimes, but it can jump higher and has more powerfull attacks to defend itself, like creating a single, big "cannon" shoot, creating a shockwave that electrocutes every nearby living creature, deactivating corrals and more that we still need to know, This is one of the biggest mysteries of evolution! Who knows how many secrets he can learn from it and it's origins...
+pedia:m.risks.form_2_electric_slime_entry: Because of all the electricity, touching this slime can hurt the rancher and, if you are unlucky, even electroshocking you (the same effects of beign stunned, only that you need more time to recover and it dosen't recover immediately). This slime can shoot extrelmy powerfull electroshock balls to the rancher, to avoid at all costs (WIP In the future it will be able to disable corrals, so think twice where you place it)!")
+pedia:m.plortonomics.form_2_electric_slime_entry: ???
+
+# Plasma Slime
+pedia:t.plasma_slime_entry: Plasma Slime
+pedia:m.intro.plasma_slime_entry: An dangerous slime with a dangerous high volt, watch out!
+pedia:m.diet.plasma_slime_entry: Veggies, Fruits and Meat
+pedia:m.favorite.plasma_slime_entry: Plasma Veggies/Fruits/Meat
+pedia:m.slimeology.plasma_slime_entry: This slime is really mysterious. Instead to respect the natural rules of plasma, can combine both of electricity and fire, but it gets called plasma slime because of it's look. It seems to emmit a high concentration of electricity and heat, and when it gets angry it can concentrate all his energy in one, unique electric or fire ball that is probably the deadliest shoot a slime can do! They seem to be made out of a fusion between electricity and fire, because they reacted to all electricity and heat tests we made with them. And they have to be powerfull, because they can shock quicksilvers and can't be destroyed by the incinerator! Such a slime was never be seen before, maybe that's the start of a new elemental slimes branch! Who knows how many secrets he can learn from it and this energy against the laws of the nature...
+pedia:m.risks.plasma_slime_entry: Because of all the plasma, touching this slime can hurt the rancher and, if you are unlucky, even electroshocking AND burn you. This slime can shoot extrelmy powerfull electroshock and burning balls to the rancher, to avoid at all costs (WIPIn the future it will be able to disable corrals, so think twice where you place it)!
+pedia:m.plortonomics.plasma_slime_entry: A good energy source that can be used to create new types of advanced machines, Mochi and Viktor and their new machines are the perfect example for it. But how exactly this plort works is unknown to us. It seems to contain the essence of a lightning tells us Thora
+
+# Food
+actor:l.electric_hen: Electric Hen
+actor:l.electric_rooster: Electric Rooster
+
+# Plorts
+actor:l.electric_plort: Electric Plort
+
+# Upgrades
+pedia:m.upgrade.name.corral.electrometer : "ElectroMeter"
+pedia:m.upgrade.desc.corral.electrometer : "A reguator, created from Mochi that allows a rancher to..."

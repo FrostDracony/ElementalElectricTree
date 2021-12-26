@@ -1,0 +1,375 @@
+﻿	class ElectricCannonBullet : SlimeSubbehaviour
+    {
+		IEnumerator delayCoroutine;
+		bool doAction = false;
+		int coolDown = 0;
+
+		IEnumerator SmoothLerp(ParticleSystem.Particle particle, Vector3 startPos, Vector3 endPos, float duration, GameObject particles)
+        {
+			Console.Log("Smoothlerping particle: " + particle);
+            for (float t = 0; t < duration; t+= Time.deltaTime)
+            {
+				particle.position = Vector3.Lerp(startPos, endPos, t);
+				yield return null;
+            }
+			Destroy(particles);
+			yield return new WaitForSeconds(5);
+
+			GameObject newParticles = Main.assetBundle.LoadAsset<GameObject>("MagicCircleVFX");
+			newParticles.transform.position = new Vector3(0, 0.25F, 0);
+
+			if (Shader.Find("SR/Particles/Additive") != null)
+			{
+				foreach (ParticleSystemRenderer particleSystemRenderer in newParticles.GetComponentsInChildren<ParticleSystemRenderer>())
+				{
+					particleSystemRenderer.material.shader = Shader.Find("SR/Particles/Additive");
+				}
+			}
+
+			Instantiate<GameObject>(newParticles, gameObject.transform);
+		}
+
+		public IEnumerator Delay(float timeToWait)
+		{
+			for (int i = 120; i < 1; i--)
+			{
+				coolDown--;
+				yield return new WaitForSeconds(timeToWait);
+			}
+		}
+
+		public void CreateCannonShot(Vector3 origin, Vector3 direction, GameObject particles)
+		{
+			Destroy(gameObject.GetComponent(typeof(SlimeRandomMove)));
+			
+			GameObject Shoot = SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_2);
+
+			Shoot.AddComponent<DamagePlayerOnTouch>().GetCopyOf(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.ROCK_SLIME).GetComponent<DamagePlayerOnTouch>());
+			Shoot.GetComponent<DamagePlayerOnTouch>().damagePerTouch = 1000;
+
+			WeaponVacuum weaponVacuum = GameObject.FindObjectOfType<WeaponVacuum>();
+			GameObject vacOrigin = weaponVacuum.vacOrigin;
+			vp_FPController componentInParent = GameObject.FindObjectOfType<vp_FPController>();
+
+			Vector3 velocity = direction * weaponVacuum.ejectSpeed * 3f + (componentInParent.Velocity * 400);
+			Console.Log("Until velocity: everything is fine");
+			ParticleSystem.Particle[] allParticles = new ParticleSystem.Particle[particles.GetComponent<ParticleSystem>().particleCount];
+			Console.Log("particle array works");
+			int aliveParticles = particles.GetComponent<ParticleSystem>().GetParticles(allParticles);
+			Console.Log("AliveParticles calculated");
+			for (int i = 0; i < aliveParticles; i++)
+			{
+				ParticleSystem.Particle particle = allParticles[i];
+
+				StartCoroutine(SmoothLerp(particle, particle.position, origin + direction.normalized * 5, 5, particles));
+			}
+			Console.Log("Particles lerped");
+			GameObject Shot = SRBehaviour.InstantiateActor(Shoot, weaponVacuum.GetPrivateField<RegionRegistry>("regionRegistry").GetCurrentRegionSetId(), origin + direction.normalized * 5, Quaternion.identity, false);
+			Console.Log("Shot created");
+			Shot.transform.LookAt(weaponVacuum.transform);
+
+			PhysicsUtil.RestoreFreezeRotationConstraints(Shot);
+
+			Shot.GetComponent<Rigidbody>().velocity = velocity;
+
+			Shot.GetComponent<Vacuumable>().Launch(Ids.NONE);
+			Shot.GetComponent<Vacuumable>().size = Vacuumable.Size.GIANT;
+			Console.Log("Everything setted");
+
+			Console.Log("Destroying SphereCollider");
+			Object.Destroy(Shot.GetComponent<SphereCollider>());
+			Console.Log("Destroying DelaunchTrigger");
+			Object.Destroy(Shot.FindChild("DelaunchTrigger"));
+			Console.Log("Destroying CoreSphere");
+			Object.Destroy(Shot.FindChild("Core Sphere"));
+			Console.Log("Destroying Shadow");
+			Object.Destroy(Shot.FindChild("Shadow"));
+
+			Console.Log("Instantiating Cannon Shot");
+			Object.Instantiate(Main.assetBundle2.LoadAsset<GameObject>("ElectricCannon"), Shot.transform);
+
+			Shot.transform.DOScale(Shot.transform.localScale, 0.1f).From(Shot.transform.localScale * 0.2f, true).SetEase(Ease.Linear);
+			Console.Log("Adding SlimeRandomMove ");
+			gameObject.AddComponent<SlimeRandomMove>().GetCopyOf(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.PINK_SLIME).GetComponentInChildren<SlimeRandomMove>());
+		}
+
+		public override void Action()
+        {
+			Console.Log("doAction: " + doAction + ", coolDown: " + coolDown);
+			if (!doAction && coolDown == 0)
+			{
+				Console.Log("DoTheAbility");
+				Destroy(GetComponent<ShootWhenAgitated>());
+				Vector3 targetPosition = SRSingleton<SceneContext>.Instance.Player.transform.position + new Vector3(0, 0.5F, 0);
+				Console.Log("This gameObject is: " + gameObject + " with child: " + gameObject.GetComponentInChildren<ParticleSystem>().gameObject + " and it's parent: " + gameObject.GetComponentInChildren<ParticleSystem>().gameObject.transform.parent);
+				Console.Log("Another child is: " + transform.Find("MagicCircleVFX"));
+				Console.Log("Code still working?");
+				CreateCannonShot(gameObject.transform.position + new Vector3(0, 3, 0), targetPosition - (gameObject.transform.position + new Vector3(0, 3, 0)), gameObject.GetComponentInChildren<ParticleSystem>().gameObject);
+				doAction = true;
+				coolDown = 120;
+				StartCoroutine(Delay(1));
+			}
+
+			if (Relevancy(true) == 0f)
+			{
+				if (delayCoroutine != null)
+				{
+					StopCoroutine(delayCoroutine);
+					delayCoroutine = null;
+				}
+				gameObject.AddComponent<ShootWhenAgitated>();
+				doAction = false;
+				coolDown = 0;
+			}
+		}
+
+        public override float Relevancy(bool isGrounded)
+        {
+			if (emotions.GetCurr(SlimeEmotions.Emotion.AGITATION) >= 0.75f)
+				return 1f;
+
+			return 0f;
+		}
+
+        public override void Selected()
+        {
+        }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+		class ElectricArrow : SlimeSubbehaviour
+	{
+		IEnumerator delayCoroutine;
+		bool doAction = false;
+		int coolDown = 0;
+		SlimeAppearance slimeAppearance;
+		SlimeAppearance shockedSlimeAppearance;
+
+	public IEnumerator Delay(float timeToWait, GameObject particles, Vector3 targetForce)
+		{
+			yield return new WaitForSeconds(timeToWait);
+
+			gameObject.GetComponent<Rigidbody>().AddForce(targetForce * 10, ForceMode.Impulse);
+
+			yield return new WaitForSeconds(5);
+
+			Destroy(particles);
+			gameObject.AddComponent<SlimeRandomMove>().GetCopyOf(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.PINK_SLIME).GetComponentInChildren<SlimeRandomMove>());
+
+			GetComponent<SlimeAppearanceApplicator>().Appearance = slimeAppearance;
+			GetComponent<SlimeAppearanceApplicator>().ApplyAppearance();
+		}
+
+		public IEnumerator Delay(float timeToWait)
+		{
+            for (int i = 60; i < 1; i--)
+            {
+				coolDown--;
+				yield return new WaitForSeconds(timeToWait);
+			}
+		}
+		IEnumerator SmoothLerp(ParticleSystem.Particle particle, Vector3 startPos, Vector3 endPos, float duration)
+		{
+			for (float t = 0; t < duration; t += Time.deltaTime)
+			{
+				particle.position = Vector3.Lerp(startPos, endPos, t);
+				yield return null;
+			}
+		}
+
+		public void TransformIntoElectricArrow()
+		{
+			Console.Log("Transform called");
+			GetComponent<SlimeAppearanceApplicator>().Appearance = shockedSlimeAppearance;
+			GetComponent<SlimeAppearanceApplicator>().ApplyAppearance();
+
+			GameObject particles = GameObject.Instantiate(Main.assetBundle.LoadAsset<GameObject>("ElectricCharge").FindChild("Particles"), transform);
+			particles.name = "ElectricCharge";
+
+			Destroy(gameObject.GetComponent(typeof(SlimeRandomMove)));
+
+			Vector3 origin = SRSingleton<SceneContext>.Instance.Player.transform.position + new Vector3(0, 0.5F, 0);
+			Vector3 direction = gameObject.transform.position + new Vector3(0, 3, 0);
+			Vector3 targetForce = origin - direction;
+
+			ParticleSystem.Particle[] allParticles = new ParticleSystem.Particle[particles.GetComponent<ParticleSystem>().particleCount];
+			int aliveParticles = particles.GetComponent<ParticleSystem>().GetParticles(allParticles);
+			for (int i = 0; i < aliveParticles; i++)
+			{
+				ParticleSystem.Particle particle = allParticles[i];
+
+				StartCoroutine(SmoothLerp(particle, particle.position, origin + direction.normalized * 1.5f, 5));
+			}
+
+			StartCoroutine(Delay(5, particles, targetForce));
+		}
+
+		public override void Awake() 
+		{
+			SlimeAppearance slimeAppearance = GetComponent<SlimeAppearanceApplicator>().Appearance;
+
+			slimeAppearance.Structures[1].DefaultMaterials[0] = Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.GOLD_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
+			this.slimeAppearance = slimeAppearance;
+			if (slimeAppearance.ShockedAppearance != null)
+			{
+				shockedSlimeAppearance = slimeAppearance.ShockedAppearance;
+			}
+			base.Awake();
+		}
+
+		public override void Action()
+		{
+			Console.Log("doAction: " + doAction + ", coolDown: " + coolDown);
+			if (!doAction && coolDown == 0)
+			{
+				Console.Log("DoTheAbility");
+				Destroy(GetComponent<ShootWhenAgitated>());
+				TransformIntoElectricArrow();
+				doAction = true;
+				coolDown = 60;
+				StartCoroutine(Delay(1));
+			}
+
+			if(Relevancy(true) == 0f)
+            {
+				if(delayCoroutine != null)
+                {
+					StopCoroutine(delayCoroutine);
+					delayCoroutine = null;
+                }
+				gameObject.AddComponent<ShootWhenAgitated>();
+				doAction = false;
+				coolDown = 0;
+            }
+		}
+
+		public override float Relevancy(bool isGrounded)
+		{
+			Console.Log("emotions: " + emotions);
+			if (emotions.GetCurr(SlimeEmotions.Emotion.AGITATION) >= 0.75f)
+				return 1f;
+
+			return 0f;
+		}
+
+		public override void Selected() 
+		{
+		}
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	class ShootWhenAgitated : SlimeSubbehaviour
+	{
+		IEnumerator currentCoroutine;
+		float delay = 0.125F;
+		int reloadTime = 10;
+		int quickShootRemains = 120;
+		bool waitBeforeShoot = false;
+		public bool canShoot = true;
+		float timeBtwShots;
+		public float startTimeBtwShots = 2;
+
+		public override void Awake() => base.Awake();
+
+        public override void Start()
+        {
+			timeBtwShots = startTimeBtwShots;
+            base.Start();
+        }
+
+        public override void Action()
+		{
+			if (canShoot)
+			{
+				if (waitBeforeShoot == false)
+				{
+					waitBeforeShoot = true;
+
+					if (currentCoroutine != null)
+					{
+						StopCoroutine(currentCoroutine);
+						currentCoroutine = null;
+					}
+
+					Shoot();
+
+					if (quickShootRemains == 0)
+						currentCoroutine = Delay(reloadTime);
+
+				}
+				else if (currentCoroutine == null && quickShootRemains > 0)
+				{
+					currentCoroutine = Delay(delay);
+					StartCoroutine(currentCoroutine);
+
+				}
+
+			}
+		}
+		public IEnumerator Delay(float timeToWait)
+        {
+			yield return new WaitForSeconds(timeToWait);
+
+			if (quickShootRemains == 0)
+			{
+				quickShootRemains = 120;
+			}
+
+			waitBeforeShoot = false;
+		}
+
+		public void Shoot()
+        {
+			if (quickShootRemains != 0)
+			{
+				Vector3 targetPosition = SRSingleton<SceneContext>.Instance.Player.transform.position + new Vector3(0, 0.5F, 0);
+				Abilities.CreateShoot(gameObject.transform.position + new Vector3(0, 3, 0), targetPosition - (gameObject.transform.position + new Vector3(0, 3, 0)), gameObject.GetComponent<RegionMember>().setId);
+				Abilities.CreateShoot(gameObject.transform.position + new Vector3(0, 3, 0), targetPosition - (gameObject.transform.position + new Vector3(0, 3, 0)), gameObject.GetComponent<RegionMember>().setId);
+				quickShootRemains--;
+			}
+
+		}
+
+
+		public override float Relevancy(bool isGrounded)
+		{
+			if (emotions.GetCurr(SlimeEmotions.Emotion.AGITATION) >= 0.5f)
+				return 1f;
+
+			return 0f;
+		}
+
+		public override void Selected()
+        {
+        }
+
+
+    }

@@ -1,22 +1,133 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using Console = SRML.Console.Console;
-using SRML.SR;
-
-using System.Reflection;
-using SRML.Console;
-using UnityEngine.SceneManagement;
 
 namespace ElementalElectricTree.Other
 {
     public static class HelperClass
     {
+
+        /*public static void ExpelAmmo(this WeaponVacuum weaponVacuum, int decrementAmount)
+        {
+            GameObject selectedStored = weaponVacuum.player.Ammo.GetSelectedStored();
+            Identifiable component = selectedStored.GetComponent<Identifiable>();
+
+            weaponVacuum.Expel(selectedStored, false);
+            weaponVacuum.player.Ammo.DecrementSelectedAmmo(decrementAmount);
+
+            if (component != null)
+            {
+                weaponVacuum.tutDir.OnShoot(component.id);
+            }
+
+            weaponVacuum.ShootEffect();
+        }*/
+
+        public static RancherChatMetadata.Entry[] CreateRancherChatConversation(this ExchangeDirector exchangeDirector, string rancherId, string[] messages)
+        {
+            List<RancherChatMetadata.Entry> entryToReturn = new List<RancherChatMetadata.Entry>();
+            Array.ForEach(messages, text =>
+            {
+                entryToReturn.Add(new RancherChatMetadata.Entry
+                {
+                    rancherName = (RancherChatMetadata.Entry.RancherName)Enum.Parse(typeof(RancherChatMetadata.Entry.RancherName), rancherId.ToUpperInvariant()),
+                    rancherImage = exchangeDirector.GetRancherImage(rancherId),
+                    messageBackground = exchangeDirector.GetRancher(rancherId).chatBackground,
+                    messageText = text
+                });
+
+            });
+
+            return entryToReturn.ToArray();
+        }
+
+        public static RancherChatMetadata.Entry[] CreateRancherChatConversation(this ExchangeDirector exchangeDirector, string rancherId, string[] messages, Sprite[] sprites)
+        {
+            List<RancherChatMetadata.Entry> entryToReturn = new List<RancherChatMetadata.Entry>();
+            int i = 0;
+            Array.ForEach(messages, text =>
+            {
+                entryToReturn.Add(new RancherChatMetadata.Entry
+                {
+                    rancherName = (RancherChatMetadata.Entry.RancherName)Enum.Parse(typeof(RancherChatMetadata.Entry.RancherName), rancherId.ToUpperInvariant()),
+                    rancherImage = sprites[i],
+                    messageBackground = exchangeDirector.GetRancher(rancherId).chatBackground,
+                    messageText = text
+                });
+
+                i++;
+            });
+
+            return entryToReturn.ToArray();
+        }
+
+        public static RancherChatMetadata.Entry CreateRancherChatMetadataEntry(this ExchangeDirector exchangeDirector, string rancherId, string message)
+        {
+            return new RancherChatMetadata.Entry
+            {
+                rancherName = (RancherChatMetadata.Entry.RancherName)Enum.Parse(typeof(RancherChatMetadata.Entry.RancherName), rancherId.ToUpperInvariant()),
+                rancherImage = exchangeDirector.GetRancherImage(rancherId),
+                messageBackground = exchangeDirector.GetRancher(rancherId).chatBackground,
+                messageText = message
+            };
+        }
+
+        public static RancherChatMetadata CreateRancherChat(this ExchangeDirector exchangeDirector, string rancherId, string[] messages)
+        {
+            List<RancherChatMetadata.Entry> entryToReturn = new List<RancherChatMetadata.Entry>();
+
+            Array.ForEach(messages, text =>
+            {
+                entryToReturn.Add(new RancherChatMetadata.Entry
+                {
+                    rancherName = (RancherChatMetadata.Entry.RancherName)Enum.Parse(typeof(RancherChatMetadata.Entry.RancherName), rancherId.ToUpperInvariant()),
+                    rancherImage = exchangeDirector.GetRancherImage(rancherId),
+                    messageBackground = exchangeDirector.GetRancher(rancherId).chatBackground,
+                    messageText = text
+                });
+
+            });
+
+            RancherChatMetadata rancherChatMetadata = ScriptableObject.CreateInstance<RancherChatMetadata>();
+            rancherChatMetadata.entries = entryToReturn.ToArray();
+
+            return rancherChatMetadata;
+        }
+
+        public static void PrintChildren(this GameObject gameObject)
+        {
+            Component[] allChildren = gameObject.GetComponents<Component>();
+            foreach (Component child in allChildren)
+            {
+                Console.Log(child.ToString());
+                if (child.TryGetComponent<Component>(out Component transform))
+                {
+                    foreach (Component child2 in child.gameObject.GetComponentsInChildren<Component>())
+                    {
+                        Console.Log("   " + child2);
+                    }
+                }
+            }
+        }
+
+        public static Vector3 EnsureNotShootingIntoRock(Vector3 startPos, Ray ray, float objRad, ref Vector3 vel)
+        {
+            float d = 0.5f;
+            Ray ray2 = new Ray(ray.origin - ray.direction * d, ray.direction);
+            float magnitude = (startPos - ray2.origin).magnitude;
+            int layerMask = 270572033;
+            RaycastHit raycastHit;
+            Physics.Raycast(ray2, out raycastHit, magnitude, layerMask, QueryTriggerInteraction.Ignore);
+            if (raycastHit.collider != null)
+            {
+                startPos = raycastHit.point - ray.direction * objRad;
+                vel -= Vector3.Project(vel, raycastHit.normal);
+            }
+            return startPos;
+        }
+
         public static IEnumerator Wait(int delay, bool ready)
         {
             int i = 0;
@@ -49,12 +160,42 @@ namespace ElementalElectricTree.Other
             }
             Console.Log("End");
         }
+
+        public static bool FindContentOfType(this Array array, Type type)
+        {
+            Console.Log("FindContentOfType                                                  yes");
+            foreach (var item in array)
+            {
+                Console.Log("item: " + item);
+
+                if (item.GetType() == type)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static void PrintComponents<T>(this SlimeAppearanceObject obj) where T : Component
+        {
+            Console.Log("Printing components of: " + obj.ToString());
+            foreach (Component component in obj.GetComponentsInChildren<T>())
+            {
+                Console.Log("   " + component);
+            }
+            Console.Log("End");
+        }
+
         public static void PrintComponent(this GameObject obj)
         {
+            Console.Log("");
+            Console.Log("");
             foreach (Component component in obj.GetComponentsInChildren<Component>(true))
             {
                 Console.Log("   " + component.ToString());
             }
+            Console.Log("");
+            Console.Log("");
         }
 
         public static GameObject PrintParent(this GameObject gameObject)
@@ -100,20 +241,40 @@ namespace ElementalElectricTree.Other
             return null;
         }
 
+        public static bool HasComponentOnlyBool<T>(this Component obj) where T : Component
+        {
+            bool Bool = obj.TryGetComponent<T>(out T returnValue);
+            return Bool;
+        }
+
         public static (bool,T) HasComponent<T>(this Component obj) where T : Component
         {
             bool Bool = obj.TryGetComponent<T>(out T returnValue);
             return (Bool,returnValue);
         }
 
+        public static void PrintContent<T>(this Array array)
+        {
+            //bool Bool = obj.TryGetComponent<T>(out T returnValue);
+            //return (Bool, returnValue);
+            //Console.Log("Printing Array!");
+            foreach(T content in array)
+            {
+                Console.Log(content.ToString());
+            }
+
+        }
+
         public static void PrintContent(this Array array)
         {
             //bool Bool = obj.TryGetComponent<T>(out T returnValue);
             //return (Bool, returnValue);
-            foreach(var content in array)
+            //Console.Log("Printing Array!");
+            foreach (var content in array)
             {
                 Console.Log(content.ToString());
             }
+
         }
 
         /*
@@ -126,17 +287,44 @@ namespace ElementalElectricTree.Other
                         }
                     }
          */
-        public static void PrintContent(this Shader shader)
+
+        public static void PrintContent(this Material material, bool parameter = false)
         {
-            Console.Log(shader.name);
+            if (parameter)
+            {
+                material.shader.PrintContent(material);
+            }
+            else
+            {
+                material.shader.PrintContent();
+            }
+        }
+
+        public static void PrintContent(this Shader shader, Material material = null)
+        {
+            Console.Log("");
+            Console.Log("");
+
+            if (material == null)
+                Console.Log("Printing Shader: " + shader.name);
+            if (material != null)
+                Console.Log("Printing Shader: " + shader.name + " of Material: " + material);
+
             for (int i2 = 0; i2 < shader.GetPropertyCount(); i2++)
             {
-                Console.Log(shader.GetPropertyName(i2) + ", " + shader.GetPropertyDescription(i2) + " : " + shader.GetPropertyType(i2));
+                if(material != null)
+                    Console.Log(shader.GetPropertyName(i2) + ", " + shader.GetPropertyDescription(i2) + " : " + shader.GetPropertyType(i2) + " = " + material.GetType().GetMethod("Get" + shader.GetPropertyType(i2)));
+                if(material == null)
+                    Console.Log(shader.GetPropertyName(i2) + ", " + shader.GetPropertyDescription(i2) + " : " + shader.GetPropertyType(i2));
                 foreach (string str in shader.GetPropertyAttributes(i2))
                 {
                     Console.Log("   " + str);
                 }
             }
+
+            Console.Log("");
+            Console.Log("");
+
         }
 
     }

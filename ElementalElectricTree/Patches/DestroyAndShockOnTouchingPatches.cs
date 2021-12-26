@@ -1,60 +1,94 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 using Console = SRML.Console.Console;
-using ElementalElectricTree.Other;
 using Creators;
 
 namespace ElementalElectricTree.Patches
 {
-    /*[HarmonyPatch(typeof(DestroyAndShockOnTouching), "DestroyAndShock")]
-    unsafe class DestroyAndShockOnTouchingPatches
+    [HarmonyPatch(typeof(DestroyAndShockOnTouching), "DestroyAndShock")]
+    class DestroyAndShockOnTouchingPatches
     {
-        public static unsafe void PostFix(DestroyAndShockOnTouching __instance)
+        public static void Prefix(DestroyAndShockOnTouching __instance)
         {
-			Console.Log("Shocking the player");
 			if (__instance.shockRadius > 0f)
 			{
-				Console.Log("2nd step");
-
 				SphereOverlapTrigger.CreateGameObject(__instance.transform.position, __instance.shockRadius, delegate (IEnumerable<Collider> colliders)
 				{
-					Console.Log("Creating ball");
-                    Console.Log("Content: ");
-					colliders.ToArray().PrintContent();    
 					foreach (Collider collider in colliders)
 					{
-						Console.Log("collider: " + collider.ToString());
 
-                        if (collider.TryGetComponent<PlayerDamageable>(out PlayerDamageable damageable))
-                        {
-                            Console.Log("Player Found");
-                            Console.Log(collider.ToString());
-                            damageable.Damage(5000, __instance.gameObject); //Shake effect
-                            break;
-                            ////__instance.transform.parent.gameObject.AddComponent<DamagePlayerOnTouch>().GetCopyOf(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.ELECTRIC_SLIME).GetComponent<DamagePlayerOnTouch>());
-                        }
+						if (SceneContext.Instance.Player == collider.gameObject)//PhysicsUtil.IsPlayerMainCollider(collider))
+						{
+							GameObject player = collider.gameObject;
+							Damageable damageable = player.GetInterfaceComponent<Damageable>();
+							if (__instance.shockRadius == GameContext.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1).GetComponent<DestroyAndShockOnTouching>().shockRadius)
+							{
+								int damage = SceneContext.Instance.GameModeConfig.gameModel.currGameMode == PlayerState.GameMode.CLASSIC ? 150 : 100;
+								if (damageable.Damage(damage, player))
+								{
+									Console.Log("Kill");
+									DeathHandler.Kill(SceneContext.Instance.Player, DeathHandler.Source.SLIME_EXPLODE, player, "ElectricSlime's Projectile");
+								}
+								else
+								{
+									Console.Log("Electrocute");
+									player.GetComponent<Effects>().Freeze();
+									//player.GetComponent<Effects>().ElectroCute();
+								}
+							} else if(__instance.shockRadius == GameContext.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_2).GetComponent<DestroyAndShockOnTouching>().shockRadius)
+                            {
+								if (damageable.Damage(1000, player))
+								{
+									Console.Log("Kill");
+									DeathHandler.Kill(SceneContext.Instance.Player, DeathHandler.Source.SLIME_EXPLODE, player, "ElectricSlime's Cannon Projectile");
+								}
+								else
+								{
+									Console.Log("Electrocute");
 
-						bool quicksilverFound = colliders.ToArray().FindContent(Identifiable.Id.QUICKSILVER_SLIME);
-						bool goldenFound = colliders.ToArray().FindContent(Identifiable.Id.GOLD_SLIME);
-						bool flag = quicksilverFound && goldenFound;
-						Console.Log("Golden or Quicksilver Slime maybe found: " + goldenFound + " and " + quicksilverFound);
-						if(flag)
-                        {
-							GameObject quicksilver = colliders.ToArray().GetContent(Identifiable.Id.QUICKSILVER_SLIME);
-							GameObject golden = colliders.ToArray().GetContent(Identifiable.Id.GOLD_SLIME);
-							Custom_Slime_Creator.CreateNewElectricSlime(quicksilver.GetComponent<ReactToShock>(), golden.GetComponent<ReactToShock>());
+									player.GetComponent<Effects>().Freeze();
+									//player.GetComponent<Effects>().ElectroCute();
+								}
+							}
+
+							/*Console.Log("Id: " + __instance.GetComponent<Identifiable>().id);
+							if(__instance.GetComponent<Identifiable>().id == Identifiable.Id.VALLEY_AMMO_1)
+                            {
+								Console.Log("Valley1");
+								if(damageable.Damage(250, __instance.gameObject))
+                                {
+									Console.Log("Kill");
+									DeathHandler.Kill(SceneContext.Instance.Player, DeathHandler.Source.SLIME_EXPLODE, __instance.gameObject, "ElectricSlime's Projectile");
+                                }
+                                else
+                                {
+									Console.Log("Electrocute");
+									Effects.ElectroCute();
+                                }
+							}
+
+							if (__instance.GetComponent<Identifiable>().id == Identifiable.Id.VALLEY_AMMO_2)
+							{
+								Console.Log("Valley2");
+								if (damageable.Damage(1000, __instance.gameObject))
+								{
+									Console.Log("Kill");
+									DeathHandler.Kill(SceneContext.Instance.Player, DeathHandler.Source.SLIME_EXPLODE, __instance.gameObject, "ElectricSlime's Cannon Projectile");
+								}
+								else
+								{
+									Console.Log("Electrocute");
+									Effects.ElectroCute();
+								}
+							}*/
+							break;
 						}
-
 					}
 
 				}, 15);
 			}
 			Destroyer.DestroyActor(__instance.gameObject, "ShockBall.DestroyAndShock", false);
 		}
-    }*/
+    }
 }
