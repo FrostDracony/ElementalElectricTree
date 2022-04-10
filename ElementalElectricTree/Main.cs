@@ -1,5 +1,5 @@
 ﻿using System;
-
+using SRML.Utils;
 using System.Reflection;
 using System.IO;
 
@@ -11,14 +11,19 @@ using Console = SRML.Console.Console;
 using UnityEngine;
 using Creators;
 using ElementalElectricTree.Other;
+using ElementalElectricTree.Patches;
 using TranslationAPI;
-
+using MoSecretStyles;
 namespace ElementalElectricTree
 {
     public class Main : ModEntryPoint
     {
         static Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Main), "electric_tree_slimes");
         public static AssetBundle assetBundle = AssetBundle.LoadFromStream(manifestResourceStream);
+
+        static Stream newManifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Main), "electric_tree_slimes_2");
+        public static AssetBundle newAssetBundle = AssetBundle.LoadFromStream(newManifestResourceStream);
+
 
         static Stream manifestResourceStream2 = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Main), "special_electric_slimes");
         public static AssetBundle assetBundle2 = AssetBundle.LoadFromStream(manifestResourceStream2);
@@ -27,9 +32,28 @@ namespace ElementalElectricTree
 
         public static Dictionary<string, GameObject> corralUpgradesModels = new Dictionary<string, GameObject>();
 
+        public static Transform prefabParent;
+
+        public Main()
+        {
+            GameObject target = new GameObject("PrefabParent");
+            target.SetActive(false);
+            UnityEngine.Object.DontDestroyOnLoad(target);
+            prefabParent = target.transform;
+        }
+
         public static bool IsModLoaded(string modId)
         {
             return SRModLoader.IsModPresent(modId);
+        }
+
+        public void ShinySlime()
+        {
+            var methodInfo = typeof(ShinySpawn_Shinify_Patches).GetMethod("Shinify");
+            var methodInfo1 = typeof(ShinySpawn_ShinyCheck_Patches).GetMethod("ShinyCheck");
+
+            HarmonyInstance.Patch(typeof(Shinies.ShinySpawn).GetMethod("Shinify"), null, new HarmonyLib.HarmonyMethod(methodInfo));
+            HarmonyInstance.Patch(typeof(Shinies.ShinySpawn).GetMethod("ShinyCheck", BindingFlags.Instance | BindingFlags.NonPublic), new HarmonyLib.HarmonyMethod(methodInfo1));
         }
 
         public override void PreLoad()
@@ -70,11 +94,52 @@ namespace ElementalElectricTree
 
             Translations.Translate();
 
+
+
+            if (IsModLoaded("shinyslimes"))
+            {
+                Console.Log("ShinySlimes is loaded");
+                ShinySlime();
+            }
+
+
+
             HarmonyInstance.PatchAll();
         }
-        
+
         public override void Load()
         {
+            if (IsModLoaded("mosecretstyles"))
+            {
+                ShortCutter.Log("MORE SECRET STYLES");
+                SRObjects.Get<Shader>("SR/AMP/Slime/Body/Matcap Stripe").PrintContent();
+
+                ModSecretStyle.onSecretStylesInitialization += () =>
+                {
+                    ShortCutter.Log("MORE SECRET STYLES STARTING");
+                    Identifiable.Id Form1Id = Ids.ELECTRIC_SLIME;
+                    ModSecretStyle modSecretStyle = new ModSecretStyle(Form1Id, new Vector3(83.18477f, 14.73f, -142.1283f), new Quaternion(), "cellRanch_Home", "podSSBlackLightning");
+                    modSecretStyle.SecretStyle.NameXlateKey = "t.secret_style_electric_slime";
+                    TranslationPatcher.AddActorTranslation("t.secret_style_electric_slime", "Black Lightning");
+                    
+                    Material material = new Material(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
+                    material.name = "BLACK_THUNDERS";
+
+
+                    modSecretStyle.SecretStyle.Structures[0].DefaultMaterials[0] = material;
+                    modSecretStyle.SecretStyle.Structures[1].DefaultMaterials[0] = material;
+                    modSecretStyle.SecretStyle.Icon = assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
+                    modSecretStyle.Definition.GetAppearanceForSet(SlimeAppearance.AppearanceSaveSet.CLASSIC).Icon = assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
+                    material.SetColor("_TopColor", Color.red);
+                    material.SetColor("_MiddleColor", Color.red);
+                    material.SetColor("_BottomColor", Color.red);
+                    material.SetColor("_GlowTop", Color.red);
+
+                    ShortCutter.Log("Logging texture");
+                    ShortCutter.Log(material.GetTexture(Shader.PropertyToID("_StripeTexture")));
+                };
+            }
+
             AmmoRegistry.RegisterAmmoPrefab(PlayerState.AmmoMode.DEFAULT, SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_4));
             AmmoRegistry.RegisterAmmoPrefab(PlayerState.AmmoMode.DEFAULT, SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_2));
             AmmoRegistry.RegisterAmmoPrefab(PlayerState.AmmoMode.DEFAULT, SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1));
@@ -113,13 +178,6 @@ namespace ElementalElectricTree
             {
                 TranslationUtil.RegisterAssembly(Assembly.GetExecutingAssembly());
             }
-            Console.Log("Checking if Shiny is loaded");
-            if(IsModLoaded("shinyslimes"))
-            {
-                Console.Log("ShinySlimes is loaded");
-                Shinies.ShinySpawn.ShinySlimeDesigns.Add("ELECTRIC", new Dictionary<string, Color32> { { "TOP", Color.cyan }, { "MID", Color.cyan }, { "BOT", Color.cyan } });
-                Shinies.ShinySpawn.ShinySlimeDesigns.Add("FORM", new Dictionary<string, Color32> { { "TOP", Color.cyan }, { "MID", Color.cyan }, { "BOT", Color.cyan } });
-            }
 
             PediaRegistry.RegisterIdEntry(Ids.ELECTRIC_SLIME_ENTRY, assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite"));
             PediaRegistry.RegisterIdEntry(Ids.FORM_2_ELECTRIC_SLIME_ENTRY, assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite"));
@@ -127,6 +185,7 @@ namespace ElementalElectricTree
 
             assetBundle.GetAllAssetNames().PrintContent<string>();
             assetBundle2.GetAllAssetNames().PrintContent<string>();
+            newAssetBundle.GetAllAssetNames().PrintContent<string>();
 
             SRML.LandPlotUpgradeRegistry.RegisterPurchasableUpgrade<CorralUI>(ElectroMeter.CreateElectricContainerEntry());
         }
@@ -140,50 +199,6 @@ namespace ElementalElectricTree
         {
             if (SceneContext.Instance.Player.GetComponent<Effects>() == null)
                 SceneContext.Instance.Player.AddComponent<Effects>();
-            
-            /*foreach (ExchangeDirector.ProgressOfferEntry progressOfferEntry in SRSingleton<SceneContext>.Instance.ExchangeDirector.progressOffers)
-            {
-                Console.Log("ProgressType: " + progressOfferEntry.progressType);
-                Console.Log("RancherChatEndIntro: " + progressOfferEntry.rancherChatEndIntro);
-                Console.Log("RancherChatEndRepeat: " + progressOfferEntry.rancherChatEndRepeat);
-
-                foreach (RancherChatMetadata.Entry entry in progressOfferEntry.rancherChatEndIntro.entries)
-                {
-                    Console.Log("   RancherChatIntro: " + entry.messageText);
-                    Console.Log("   Rancher's Image: " + entry.rancherImage);
-                }
-
-                foreach (RancherChatMetadata.Entry entry in progressOfferEntry.rancherChatEndRepeat.entries)
-                {
-                    Console.Log("   RancherChatRepeat: " + entry.messageText);
-                    Console.Log("   Rancher's Image: " + entry.rancherImage);
-                }
-
-                Console.Log("Length: " + progressOfferEntry.rewardLevels.Length);
-                int i = 0;
-                foreach (ExchangeDirector.RewardLevel rewardLevel in progressOfferEntry.rewardLevels)
-                {
-                    Console.Log("RewardLevel " + i + ": " + rewardLevel);
-                    Console.Log("   Count: " + rewardLevel.count);
-                    Console.Log("   RequestedItem: " + rewardLevel.requestedItem);
-                    Console.Log("   Reward: " + rewardLevel.reward);
-                    
-                    foreach (RancherChatMetadata.Entry entry in rewardLevel.rancherChatIntro.entries)
-                    {
-                        Console.Log("   RancherChatIntro: " + entry.messageText);
-                        Console.Log("   Rancher's Image: " + entry.rancherImage);
-                    }
-
-                    foreach (RancherChatMetadata.Entry entry in rewardLevel.rancherChatRepeat.entries)
-                    {
-                        Console.Log("   RancherChatRepeat: " + entry.messageText);
-                        Console.Log("   Rancher's Image: " + entry.rancherImage);
-                    }
-
-                    i++;
-                }
-                Console.Log("SpecialOfferType: " + progressOfferEntry.specialOfferType);
-            }*/
 
             ExchangeDirector exchangeDirector = SRSingleton<SceneContext>.Instance.ExchangeDirector;
             ExchangeDirector.ProgressOfferEntry progressOfferEntry1 = exchangeDirector.progressOffers[1];

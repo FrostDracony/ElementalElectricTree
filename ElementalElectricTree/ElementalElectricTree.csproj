@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ElementalElectricTree</RootNamespace>
     <AssemblyName>ElementalElectricTree</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,24 +33,31 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
+    <Reference Include="0Harmony, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\SRML\Libs\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\AssemblyPublicizer-Purple\publicized_assemblies\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="DOTween">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\DOTween.dll</HintPath>
     </Reference>
-    <Reference Include="MrPurples-Assembly-CSharp_old_publicized">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\publicized_assemblies\MrPurples-Assembly-CSharp_old_publicized.dll</HintPath>
+    <Reference Include="MoSecretStyles">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\SRML\Mods\MoSecretStyles.dll</HintPath>
     </Reference>
-    <Reference Include="ShinySlimes">
+    <Reference Include="ShinySlimes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\SRML\Mods\ShinySlimes.dll</HintPath>
     </Reference>
     <Reference Include="SlimeTranslationAPI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\SRML\Mods\SlimeTranslationAPI\SlimeTranslationAPI.dll</HintPath>
     </Reference>
-    <Reference Include="SRML_publicized">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\publicized_assemblies\SRML_publicized.dll</HintPath>
+    <Reference Include="SRML, Version=0.1.8.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\AssemblyPublicizer-Purple\publicized_assemblies\SRML.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -303,6 +311,7 @@
     <Compile Include="Creators\ExchangeCreator.cs" />
     <Compile Include="Creators\FoodCreator.cs" />
     <Compile Include="Creators\PlortCreator.cs" />
+    <Compile Include="Creators\ShortCutter.cs" />
     <Compile Include="Creators\SlimeCreator.cs" />
     <Compile Include="Creators\SlimePrefabs\ElectricSlimeForm1.cs" />
     <Compile Include="Creators\SlimePrefabs\ElectricSlimeForm2.cs" />
@@ -319,6 +328,8 @@
     <Compile Include="Patches\DestroyAndShockOnTouchingPatches.cs" />
     <Compile Include="Patches\ElectricSlimesPatches.cs" />
     <Compile Include="Patches\ReactToShockPatches.cs" />
+    <Compile Include="Patches\ShinySpawn_ChangeRartiy_Patches.cs" />
+    <Compile Include="Patches\ShinySpawn_Shinify_Patches.cs" />
     <Compile Include="Patches\ZoneAndRegionPatches.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SlimeForms\ElectricSlimes.cs" />
@@ -341,5 +352,17 @@
   <ItemGroup>
     <Content Include="Creators\backup.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="electric_tree_slimes_2" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>del "C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher\SRML\Mods\ElementalElectricTree.dll"
+xcopy "C:\Users\baton\source\repos\ElementalElectricTree\ElementalElectricTree\bin\Debug\ElementalElectricTree.dll" "C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher\SRML\Mods"
+</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
 </Project>

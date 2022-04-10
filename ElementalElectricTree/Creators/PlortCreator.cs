@@ -39,7 +39,6 @@ namespace Creators
             Prefab.GetComponent<MeshRenderer>().material = Object.Instantiate<Material>(Prefab.GetComponent<MeshRenderer>().material);
             Color PureYellow = new Color32(255, 255, 0, byte.MaxValue);
 
-            Prefab.GetComponent<MeshRenderer>().material.shader.PrintContent();
             Prefab.GetComponent<MeshRenderer>().material.SetColor("_TopColor", PureYellow);
             Prefab.GetComponent<MeshRenderer>().material.SetColor("_MiddleColor", PureYellow);
             Prefab.GetComponent<MeshRenderer>().material.SetColor("_BottomColor", PureYellow);

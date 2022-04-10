@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using ElementalElectricTree;
 using ElementalElectricTree.Other;
+using SRML.Utils;
+using System.Linq;
 
 namespace Creators
 {
@@ -44,9 +46,8 @@ namespace Creators
             SlimeAppearance slimeAppearance = slimeObject.GetComponent<SlimeAppearanceApplicator>().Appearance;
 
             SlimeAppearanceStructure[] structures = slimeAppearance.Structures;
-            Material material = UnityEngine.Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.BOOM_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
-
-            material.shader.PrintContent();
+            
+            Material material = Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.BOOM_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
 
             foreach (SlimeAppearanceStructure slimeAppearanceStructure in structures)
             {
@@ -64,38 +65,69 @@ namespace Creators
                     material.SetFloat(Shader.PropertyToID("_CrackAmount"), 0);
                     material.SetFloat(Shader.PropertyToID("_Char"), 0);
 
-                    material.shader.PrintContent();
-
                     slimeAppearanceStructure.DefaultMaterials[0] = material;
                 }
 
             }
 
-            SlimeExpressionFace[] expressionFaces = slimeAppearance.Face.ExpressionFaces;
-            for (int k = 0; k < expressionFaces.Length; k++)
-            {
-                SlimeExpressionFace slimeExpressionFace = expressionFaces[k];
-                if ((bool)slimeExpressionFace.Mouth)
-                {
-                    slimeExpressionFace.Mouth.SetColor("_MouthBot", new Color32(205, 190, 255, 255));
-                    slimeExpressionFace.Mouth.SetColor("_MouthMid", new Color32(182, 170, 226, 255));
-                    slimeExpressionFace.Mouth.SetColor("_MouthTop", new Color32(182, 170, 205, 255));
-                }
-                if ((bool)slimeExpressionFace.Eyes)
-                {
-                    SRML.Console.Console.Log("SlimeEyes: " + slimeExpressionFace.Eyes.GetTexture("_FaceAtlas"));
-                    slimeExpressionFace.Eyes.PrintContent();
-                    slimeExpressionFace.Eyes.SetColor("_EyeRed", new Color32(205, 190, 255, 255));
-                    slimeExpressionFace.Eyes.SetColor("_EyeGreen", new Color32(182, 170, 226, 255));
-                    slimeExpressionFace.Eyes.SetColor("_EyeBlue", new Color32(182, 170, 205, 255));
-                }
-            }
             slimeAppearance.Face.OnEnable();
 
-            /*List<SlimeAppearanceStructure> structureList = slimeAppearance.Structures.ToList();
-            structureList.RemoveRange(1, 2);
-            slimeAppearance.Structures = structureList.ToArray();*/
+            #region CustomModel
+            slimeAppearance.Structures = new SlimeAppearanceStructure[2]
+            {
+            new SlimeAppearanceStructure(slimeAppearance.Structures[0]),
+            new SlimeAppearanceStructure(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.LUCKY_SLIME).GetAppearanceForSet(SlimeAppearance.AppearanceSaveSet.CLASSIC).Structures[2]),
+            };
 
+            Mesh customCrest = Main.newAssetBundle.LoadAsset<GameObject>("thundercrest").FindChild("default").GetComponent<MeshFilter>().sharedMesh;
+
+            SlimeAppearanceObject[] slimeAppearanceObjects = slimeAppearance.Structures[1].Element.Prefabs.ToArray();
+
+            GameObject LOD0 = PrefabUtils.CopyPrefab(slimeAppearanceObjects[0].gameObject);
+            LOD0.GetComponent<MeshFilter>().sharedMesh = customCrest;
+            /*LOD0.gameObject.transform.localPosition = new Vector3(0f, 1, 0.3f);
+            var transformLocalRotation = LOD0.transform.localRotation;
+            transformLocalRotation.eulerAngles = new Vector3(30f, 0, 0);
+            LOD0.transform.localRotation = transformLocalRotation;*/
+
+            slimeAppearanceObjects[0] = LOD0.GetComponent<SlimeAppearanceObject>();
+
+            GameObject LOD1 = PrefabUtils.CopyPrefab(slimeAppearanceObjects[1].gameObject);
+            LOD1.GetComponent<MeshFilter>().sharedMesh = customCrest;
+            /*LOD1.gameObject.transform.localPosition = new Vector3(0f, 1, 0.3f);
+            var transformLocalRotation1 = LOD1.transform.localRotation;
+            transformLocalRotation1.eulerAngles = new Vector3(30f, 0, 0);
+            LOD1.transform.localRotation = transformLocalRotation;*/
+
+            slimeAppearanceObjects[1] = LOD1.GetComponent<SlimeAppearanceObject>();
+
+            ShortCutter.Log("Pls work");
+
+            SlimeAppearanceElement slimeThunderCrest = ScriptableObject.CreateInstance<SlimeAppearanceElement>();
+            slimeThunderCrest.Name = "slimeThunderCrest";
+            slimeThunderCrest.Prefabs = slimeAppearanceObjects;
+            slimeAppearance.Structures[1].Element = slimeThunderCrest;
+
+            ShortCutter.Log("and now?");
+
+            SlimeDefinition quickSilverDefinitionToUse = SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME);
+            SlimeDefinition quickSilverDefinition = (SlimeDefinition)PrefabUtils.DeepCopyObject(quickSilverDefinitionToUse);
+
+            SlimeAppearance slimeShocked = Object.Instantiate(quickSilverDefinition.AppearancesDefault[0].ShockedAppearance);
+
+            slimeShocked.Structures = new SlimeAppearanceStructure[]
+            {
+                slimeAppearance.Structures[0], slimeAppearance.Structures[1]
+            };
+
+            slimeShocked.Structures[0].DefaultMaterials[0] = quickSilverDefinition.AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0];
+
+            slimeAppearance.ShockedAppearance = slimeShocked;
+
+            #endregion
+
+
+            #region Components
             //slimeObject.AddComponent<ChangeParticlesNormal>();
             slimeObject.AddComponent<ChangeParticlesAngry>();
             
@@ -122,6 +154,7 @@ namespace Creators
             }
 
             Object.Instantiate(particles, slimeObject.transform);
+            #endregion
 
             return (slimeDefinition, slimeObject);
         }

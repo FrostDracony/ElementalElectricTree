@@ -5,14 +5,14 @@
 namespace ElementalElectricTree
 {
     [EnumHolder]
-    class Ids
+    public class Ids
     {
         public static readonly Identifiable.Id ELECTRIC_PLORT;
 
         public static readonly Identifiable.Id ELECTRIC_SLIME;
         public static readonly PediaDirector.Id ELECTRIC_SLIME_ENTRY;
-
         public static readonly Identifiable.Id FORM_2_ELECTRIC_SLIME;
+        
         public static readonly PediaDirector.Id FORM_2_ELECTRIC_SLIME_ENTRY;
 
         public static readonly Identifiable.Id PLASMA_SLIME;

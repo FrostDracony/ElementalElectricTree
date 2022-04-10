@@ -44,18 +44,18 @@ namespace ElementalElectricTree.Patches
         }
     }*/
 
-    [HarmonyPatch(typeof(Shinies.ShinySpawn), "ShinyCheck")]
+/*    [HarmonyPatch(typeof(Shinies.ShinySpawn), "ShinyCheck")]
     class DebugPatchesV2
     {
         public static bool Prefix(Shinies.ShinySpawn __instance, ref Shinies.ShinySpawn.Skin __result)
         {
-            if(Main.IsModLoaded("shinyslimes"))
+            if (Main.IsModLoaded("shinyslimes"))
             {
                 Identifiable.Id id = Identifiable.GetId(__instance.gameObject);
 
                 if (id == Ids.ELECTRIC_SLIME || id == Ids.FORM_2_ELECTRIC_SLIME)
                 {
-                    int num = UnityEngine.Random.Range(1, 25);
+                    int num = UnityEngine.Random.Range(1, 1);
                     bool flag = num == 1;
                     Shinies.ShinySpawn.Skin result = Shinies.ShinySpawn.Skin.Normal;
                     if (flag)
@@ -69,7 +69,7 @@ namespace ElementalElectricTree.Patches
             }
             return true;
         }
-    }
+    }*/
 
     [HarmonyPatch(typeof(WeaponVacuum), "ExpelAmmo")]
     class DebugPatchesV1

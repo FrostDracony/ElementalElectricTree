@@ -4,11 +4,14 @@ using Console = SRML.Console.Console;
 using ElementalElectricTree;
 using ElementalElectricTree.Other;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Creators
 {
     class ElectricSlimeForm1Prefab
     {
+        static void Log(object message) => Console.Log(message.ToString());
+
         public static (SlimeDefinition, GameObject) GetPrefab(bool autoRegister = true)
         {
             (SlimeDefinition, GameObject) SlimeTuple = Custom_Slime_Creator.CreateSlime(
@@ -45,18 +48,17 @@ namespace Creators
             SlimeDefinition slimeDefinition = SlimeTuple.Item1;
             GameObject slimeObject = SlimeTuple.Item2;
             SlimeAppearance slimeAppearance = slimeObject.GetComponent<SlimeAppearanceApplicator>().Appearance;
-            slimeDefinition.AppearancesDefault.PrintContent();
+            Log("Printing slimeAppearance");
+
             int appearanceInt = 0;
-            foreach(SlimeAppearance appearance in slimeDefinition.AppearancesDefault)
+            foreach (SlimeAppearance appearance in slimeDefinition.AppearancesDefault)
             {
-                if(appearance.ShockedAppearance != null)
-                {
-                    Console.Log("Appearance number: " + appearanceInt + " has a shocked appearance");
-                }
+                Log("Appearance " + appearance + " found in position " + appearanceInt);
                 appearanceInt++;
             }
-
             slimeObject.GetComponent<SlimeAppearanceApplicator>().Appearance = (SlimeAppearance)PrefabUtils.DeepCopyObject(slimeDefinition.AppearancesDefault[0]);
+            SlimeAppearanceApplicator slimeAppearanceApplicator = slimeObject.GetComponent<SlimeAppearanceApplicator>();
+
             SlimeAppearanceStructure[] structures = slimeAppearance.Structures;
 
             int i = 0; //1 = Body, 2 = crest
@@ -76,61 +78,67 @@ namespace Creators
                     material.SetFloat(Shader.PropertyToID("_GlossPower"), 6F);
                     material.SetFloat(Shader.PropertyToID("_Shininess"), 2F);
 
-                    Console.Log(material.GetColor(Shader.PropertyToID("_TopColor")).ToString());
-                    Console.Log(material.GetColor(Shader.PropertyToID("_MiddleColor")).ToString());
-                    Console.Log(material.GetColor(Shader.PropertyToID("_BottomColor")).ToString());
-                    Console.Log("");
-
                     material.SetColor(Shader.PropertyToID("_TopColor"), new Color(0.541F, 0.667F, 0.663F, 1.000F));
                     material.SetColor(Shader.PropertyToID("_MiddleColor"), new Color(0.384F, 0.420F, 0.439F, 1.000F));
                     material.SetColor(Shader.PropertyToID("_BottomColor"), new Color(0.180F, 0.149F, 0.208F, 1.000F));
 
-                    material.shader.PrintContent();
                     slimeAppearanceStructure.DefaultMaterials[0] = material;
                 }
-                else
-                {
-                    int i2 = 0;
-                    int num = slimeAppearance.Structures[1].Element.Prefabs.Length;
-                    for (int j = 0; j < num; j++)
-                    {
-                        Console.Log("Creating the custommesh, loop number: " + j);
-                        SlimeAppearanceObject prefab = slimeAppearance.Structures[1].Element.Prefabs[j];
-                        SlimeAppearanceObject component = PrefabUtils.CopyPrefab(prefab.gameObject).GetComponent<SlimeAppearanceObject>();
-
-                        var returnvalue = prefab.gameObject.PrintParent();
-                        if (returnvalue != null)
-                            returnvalue.PrintParent();
-
-                        if (component.TryGetComponent<MeshFilter>(out MeshFilter filter))
-                        {
-                            filter.sharedMesh = Main.assetBundle.LoadAsset<GameObject>("BoldCrest").GetComponentInChildren<MeshFilter>(true).sharedMesh;
-                        }
-
-                        if (component.TryGetComponent<SkinnedMeshRenderer>(out SkinnedMeshRenderer skinned))
-                        {
-                            skinned.sharedMesh = Main.assetBundle.LoadAsset<GameObject>("BoldCrest").GetComponentInChildren<MeshFilter>(true).sharedMesh;
-                        }
-
-                        slimeAppearance.Structures[1].Element.Prefabs[i2] = component;
-
-                        i2++;
-                    }
-
-                    slimeAppearanceStructure.DefaultMaterials[0] = goldMaterial;
-                }
-
-                i++;
-
             }
 
+            #region CustomModel
+            slimeAppearance.Structures = new SlimeAppearanceStructure[2]
+            {
+            new SlimeAppearanceStructure(slimeAppearance.Structures[0]),
+            new SlimeAppearanceStructure(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.LUCKY_SLIME).GetAppearanceForSet(SlimeAppearance.AppearanceSaveSet.CLASSIC).Structures[2]),
+            };
+
+            Mesh customCrest = Main.newAssetBundle.LoadAsset<GameObject>("thundercrest").FindChild("default").GetComponent<MeshFilter>().sharedMesh;
+
+            SlimeAppearanceObject[] slimeAppearanceObjects = slimeAppearance.Structures[1].Element.Prefabs.ToArray();
+
+            GameObject LOD0 = PrefabUtils.CopyPrefab(slimeAppearanceObjects[0].gameObject);
+            LOD0.GetComponent<MeshFilter>().sharedMesh = customCrest;
+            LOD0.gameObject.transform.localPosition = new Vector3(0f, 1, 0.3f);
+            var transformLocalRotation = LOD0.transform.localRotation;
+            transformLocalRotation.eulerAngles = new Vector3(30f, 0, 0);
+            LOD0.transform.localRotation = transformLocalRotation;
+
+            slimeAppearanceObjects[0] = LOD0.GetComponent<SlimeAppearanceObject>();
+
+            GameObject LOD1 = PrefabUtils.CopyPrefab(slimeAppearanceObjects[1].gameObject);
+            LOD1.GetComponent<MeshFilter>().sharedMesh = customCrest;
+            LOD1.gameObject.transform.localPosition = new Vector3(0f, 1, 0.3f);
+            var transformLocalRotation1 = LOD1.transform.localRotation;
+            transformLocalRotation1.eulerAngles = new Vector3(30f, 0, 0);
+            LOD1.transform.localRotation = transformLocalRotation;
+
+            slimeAppearanceObjects[1] = LOD1.GetComponent<SlimeAppearanceObject>();
+
+            SlimeAppearanceElement slimeThunderCrest = ScriptableObject.CreateInstance<SlimeAppearanceElement>();
+            slimeThunderCrest.Name = "slimeThunderCrest";
+            slimeThunderCrest.Prefabs = slimeAppearanceObjects;
+            slimeAppearance.Structures[1].Element = slimeThunderCrest;
+
+            SlimeAppearance slimeShocked = Object.Instantiate(slimeDefinition.AppearancesDefault[0].ShockedAppearance);
+            slimeShocked.Structures = new SlimeAppearanceStructure[]
+            {
+                slimeAppearance.Structures[0], slimeAppearance.Structures[1]
+            };
+
+            slimeShocked.Structures[0].DefaultMaterials[0] = slimeDefinition.AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0];
+
+            slimeAppearance.ShockedAppearance = slimeShocked;
+
+            #endregion
+
+            #region Components
             //slimeObject.AddComponent<ChangeParticlesNormal>();
             slimeObject.AddComponent<ChangeParticlesAngry>();
 
             //slimeObject.AddComponent<ElectricArrow>();
             slimeObject.AddComponent<ShockOnTouch>();
             //slimeObject.AddComponent<ShootWhenAgitated>();
-            slimeObject.AddComponent<LODSetter>();
 
             slimeObject.GetComponent<DamagePlayerOnTouch>().damagePerTouch = 70;
             slimeObject.GetComponent<PuddleSlimeScoot>().straightlineForceFactor *= 4;
@@ -154,26 +162,14 @@ namespace Creators
 
             Object.Instantiate(particles, slimeObject.transform);
 
+            #endregion
+
+            #region SecretStyle
             SlimeAppearance secretAppearance = (SlimeAppearance)PrefabUtils.DeepCopyObject(slimeAppearance);
-            secretAppearance.NameXlateKey = "l.secret_style_electric_slime";
 
-            secretAppearance.Structures[0].DefaultMaterials[0].SetTexture(Shader.PropertyToID("_CubemapOverride"), SRML.SRObjects.GetInst<Material>("slimeQuickSilverBase").GetTexture(Shader.PropertyToID("_CubemapOverride")));
+            //ShortCutter.RegisterSecretStyle(Ids.ELECTRIC_SLIME, secretAppearance, slimeDefinition, "Black Lightning");
 
-            Dictionary<SlimeDefinition, SlimeAppearance> newDict = new Dictionary<SlimeDefinition, SlimeAppearance>
-            {
-                { slimeDefinition, secretAppearance }
-            };
-
-            Main.SecretStyleList.Add(Ids.ELECTRIC_SLIME, newDict);
-
-            GameContext.Instance.DLCDirector.onPackageInstalled += (s =>
-            {
-                if (s != DLCPackage.Id.SECRET_STYLE)
-                    return;
-
-                slimeDefinition.RegisterDynamicAppearance(secretAppearance);
-                ///SceneContext.Instance.SlimeAppearanceDirector.UnlockAppearance(slimeDefinition, secretAppearance);
-            });
+            #endregion
 
             return (slimeDefinition, slimeObject);
         }

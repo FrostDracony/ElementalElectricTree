@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using Console = SRML.Console.Console;
+using System.Linq;
 
 namespace ElementalElectricTree.Other
 {
@@ -24,6 +25,10 @@ namespace ElementalElectricTree.Other
 
             weaponVacuum.ShootEffect();
         }*/
+
+        public static void Log(object message) => Console.Log(message.ToString());
+
+        public static GameObject FindChild(this GameObject @object, string childsName) => @object.transform.Find(childsName).gameObject;
 
         public static RancherChatMetadata.Entry[] CreateRancherChatConversation(this ExchangeDirector exchangeDirector, string rancherId, string[] messages)
         {
@@ -327,6 +332,161 @@ namespace ElementalElectricTree.Other
 
         }
 
+        public static T CreatePrefab<T>(this T obj) where T : UnityEngine.Object => UnityEngine.Object.Instantiate<T>(obj, Main.prefabParent, false);
+
+        public static T Copy<T>(this T obj) where T : UnityEngine.Object => UnityEngine.Object.Instantiate<T>(obj, Main.prefabParent, false);
+
+        public static SkinnedMeshRenderer ConvertToSkinned(this GameObject gameObject)
+        {
+            GameObject.Destroy(gameObject.GetComponent<MeshFilter>());
+            GameObject.Destroy(gameObject.GetComponent<MeshRenderer>());
+            return gameObject.AddComponent<SkinnedMeshRenderer>();
+        }
+        public static void GenerateBoneData(SlimeAppearanceApplicator slimePrefab, SlimeAppearanceObject bodyApp, float jiggleAmount = 1, float scale = 1, Mesh[] AdditionalMesh = null, params SlimeAppearanceObject[] appearanceObjects)
+        {
+            if (AdditionalMesh == null)
+                AdditionalMesh = new Mesh[0];
+            var mesh = bodyApp.GetComponent<SkinnedMeshRenderer>().sharedMesh;
+            bodyApp.AttachedBones = new SlimeAppearance.SlimeBone[] { SlimeAppearance.SlimeBone.Slime, SlimeAppearance.SlimeBone.JiggleRight, SlimeAppearance.SlimeBone.JiggleLeft, SlimeAppearance.SlimeBone.JiggleTop, SlimeAppearance.SlimeBone.JiggleBottom, SlimeAppearance.SlimeBone.JiggleFront, SlimeAppearance.SlimeBone.JiggleBack };
+            foreach (var a in appearanceObjects)
+                a.AttachedBones = bodyApp.AttachedBones;
+            var v = mesh.vertices;
+            var max = new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity);
+            var min = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+            var sum = Vector3.zero;
+            for (int i = 0; i < v.Length; i++)
+            {
+                sum += v[i];
+                if (v[i].x > max.x)
+                    max.x = v[i].x;
+                if (v[i].x < min.x)
+                    min.x = v[i].x;
+                if (v[i].y > max.y)
+                    max.y = v[i].y;
+                if (v[i].y < min.y)
+                    min.y = v[i].y;
+                if (v[i].z > max.z)
+                    max.z = v[i].z;
+                if (v[i].z < min.z)
+                    min.z = v[i].z;
+            }
+            var center = sum / v.Length;
+            var dis = 0f;
+            foreach (var ver in v)
+                dis += (ver - center).magnitude;
+            dis /= v.Length;
+
+            foreach (var m in new Mesh[] { mesh }.Concat(appearanceObjects.All((x) => true, (x) => x.GetComponent<SkinnedMeshRenderer>().sharedMesh)).Concat(AdditionalMesh))
+            {
+                Log(m.name);
+                var v2 = m.vertices;
+                var b = new BoneWeight[v2.Length];
+                for (int i = 0; i < v2.Length; i++)
+                {
+                    var r = v2[i] - center;
+                    var o = Mathf.Clamp01((r.magnitude - (dis / 4)) / (dis / 2) * jiggleAmount);
+                    b[i] = new BoneWeight();
+                    if (o == 0)
+                        b[i].weight0 = 1;
+                    else
+                    {
+                        b[i].weight0 = 1 - o;
+                        b[i].boneIndex1 = r.x >= 0 ? 1 : 2;
+                        b[i].boneIndex2 = r.y >= 0 ? 3 : 4;
+                        b[i].boneIndex3 = r.z >= 0 ? 5 : 6;
+                        var n = r.Multiply(r).Multiply(r).Abs();
+                        var s = n.ToArray().Sum();
+                        b[i].weight1 = n.x / s * o;
+                        b[i].weight2 = n.y / s * o;
+                        b[i].weight3 = n.z / s * o;
+                    }
+                    b[i].weight0 *= scale;
+                    b[i].weight1 *= scale;
+                    b[i].weight2 *= scale;
+                    b[i].weight3 *= scale;
+                }
+                m.boneWeights = b;
+
+                var p = new Matrix4x4[bodyApp.AttachedBones.Length];
+                for (int i = 0; i < bodyApp.AttachedBones.Length; i++)
+                    p[i] = slimePrefab.Bones.First((x) => x.Bone == bodyApp.AttachedBones[i]).BoneObject.transform.worldToLocalMatrix * slimePrefab.Bones.First((x) => x.Bone == SlimeAppearance.SlimeBone.Root).BoneObject.transform.localToWorldMatrix;
+                m.bindposes = p;
+            }
+        }
+
+
+        public static float[] ToArray(this Vector3 value) => new float[] { value.x, value.y, value.z };
+        public static Vector3 Abs(this Vector3 value) => new Vector3(Mathf.Abs(value.x), Mathf.Abs(value.y), Mathf.Abs(value.z));
+        public static Vector3 Multiply(this Vector3 value, float x, float y, float z) => new Vector3(value.x * x, value.y * y, value.z * z);
+        public static Vector3 Multiply(this Vector3 value, Vector3 scale) => value.Multiply(scale.x, scale.y, scale.z);
+        public static List<Y> All<X, Y>(this IEnumerable<X> c, Predicate<X> predicate, Func<X, Y> converter, bool enforceUnique = false)
+        {
+            var l = new List<Y>();
+            foreach (var i in c)
+                if (predicate(i))
+                {
+                    if (enforceUnique)
+                        l.AddUnique(converter(i));
+                    else
+                        l.Add(converter(i));
+                }
+            return l;
+        }
+        public static bool AddUnique<T>(this List<T> l, T value)
+        {
+            if (l.Contains(value))
+                return false;
+            l.Add(value);
+            return true;
+        }
+
+        public static Mesh CreateMesh(
+  IEnumerable<Vector3> vertices,
+  IEnumerable<int> triangles,
+  IEnumerable<Vector2> uv,
+  Predicate<Vector3> removeAt,
+  Func<Vector3, Vector3> modify,
+  string name = "mesh")
+        {
+            Mesh mesh = new Mesh();
+            mesh.name = name;
+            List<Vector3> list1 = vertices.ToList<Vector3>();
+            List<int> list2 = triangles.ToList<int>();
+            List<Vector2> list3 = uv.ToList<Vector2>();
+            for (int index1 = list1.Count - 1; index1 >= 0; --index1)
+            {
+                if (removeAt(list1[index1]))
+                {
+                    list1.RemoveAt(index1);
+                    list3.RemoveAt(index1);
+                    for (int index2 = list2.Count - 3; index2 >= 0; index2 -= 3)
+                    {
+                        if (list2[index2] == index1 || list2[index2 + 1] == index1 || list2[index2 + 2] == index1)
+                        {
+                            list2.RemoveRange(index2, 3);
+                        }
+                        else
+                        {
+                            if (list2[index2] > index1)
+                                list2[index2]--;
+                            if (list2[index2 + 1] > index1)
+                                list2[index2 + 1]--;
+                            if (list2[index2 + 2] > index1)
+                                list2[index2 + 2]--;
+                        }
+                    }
+                }
+                else
+                    list1[index1] = modify(list1[index1]);
+            }
+            mesh.vertices = list1.ToArray();
+            mesh.triangles = list2.ToArray();
+            mesh.uv = list3.ToArray();
+            mesh.RecalculateBounds();
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+            return mesh;
+        }
     }
 
 }

@@ -4,5 +4,5 @@
 	"author": "FrostDracony (Main developer), MegaPiggy (helped me a lot to do this mod)",
 	"description": "A Mod adding electric slimes and their descendants in Slime Rancher",
 	"version": "0.2",
-	"load_after": ["translationapi", "shinyslimes"],
+	"load_after": [ "translationapi", "shinyslimes", "mosecretstyles" ]
 }

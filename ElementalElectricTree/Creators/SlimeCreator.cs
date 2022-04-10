@@ -71,9 +71,8 @@ namespace Creators
             SlimeAppearance slimeAppearance = slimeObject.GetComponent<SlimeAppearanceApplicator>().Appearance;
 
             SlimeAppearanceStructure[] structures = slimeAppearance.Structures;
-            Material material = UnityEngine.Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.PINK_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
+            Material material = Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.PINK_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
 
-            material.shader.PrintContent();
 
             foreach (SlimeAppearanceStructure slimeAppearanceStructure in structures)
             {
@@ -88,8 +87,6 @@ namespace Creators
                     material.SetFloat(Shader.PropertyToID("_Gloss"), 3.5F);
                     material.SetFloat(Shader.PropertyToID("_GlossPower"), 6F);
                     material.SetFloat(Shader.PropertyToID("_Shininess"), 2F);
-
-                    material.shader.PrintContent();
 
                     slimeAppearanceStructure.DefaultMaterials[0] = material;
                 }
@@ -125,18 +122,15 @@ namespace Creators
             slimeObject.GetComponent<SlimeRandomMove>().scootSpeedFactor *= 6;
             slimeObject.GetComponent<SlimeRandomMove>().verticalFactor *= 3;
 
-            GameObject.Destroy(slimeObject.GetComponent(typeof(PinkSlimeFoodTypeTracker)));
+            Object.Destroy(slimeObject.GetComponent(typeof(PinkSlimeFoodTypeTracker)));
 
             return (slimeDefinition, slimeObject);
         }
 
         unsafe public static void CreateElectricSlime(ReactToShock quickSilverSlime, ReactToShock goldSlime, SlimeAppearance shocked)
         {
-            Console.Log("Quicksilver position: " + quickSilverSlime.gameObject.transform.position);
-            Console.Log("GoldSlime position: " + goldSlime.gameObject.transform.position);
-
             Vector3 Position = Vector3.Lerp(quickSilverSlime.gameObject.transform.position, goldSlime.gameObject.transform.position, 0.5F);
-            Console.Log("FinalPosition: " + Position);
+
             if (quickSilverSlime.GetPrivateField<RegionMember>("regionMember").setId == RegionRegistry.RegionSetId.VALLEY)
             {
                 //SRBehaviour.InstantiateActor(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.ELECTRIC_SLIME), GameObject.FindObjectOfType<WeaponVacuum>().GetPrivateField<RegionRegistry>("regionRegistry").GetCurrentRegionSetId(), Position, Quaternion.identity, false);
