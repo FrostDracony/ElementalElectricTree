@@ -33,7 +33,9 @@ namespace ElementalElectricTree.Other
 
             TranslationPatcher.AddActorTranslation("l.electric_plort", "Electric Plort");
 
-            TranslationPatcher.AddActorTranslation("l.secret_style_electric_slime", "Blue Electric Slime");
+            TranslationPatcher.AddActorTranslation("t.secret_style_electric_slime", "Black Lightning");
+
+            TranslationPatcher.AddActorTranslation("t.secret_style_electric_slime_form_2", "Overdrive");
         }
     }
 }

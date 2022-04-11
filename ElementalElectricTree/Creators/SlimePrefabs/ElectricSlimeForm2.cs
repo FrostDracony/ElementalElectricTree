@@ -47,23 +47,23 @@ namespace Creators
 
             SlimeAppearanceStructure[] structures = slimeAppearance.Structures;
             
-            Material material = Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.BOOM_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
+            Material material = Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
 
             foreach (SlimeAppearanceStructure slimeAppearanceStructure in structures)
             {
                 Material[] defaultMaterials = slimeAppearanceStructure.DefaultMaterials;
                 if (defaultMaterials != null && defaultMaterials.Length != 0)
                 {
-                    material.SetColor("_TopColor", Color.yellow);
+                    /*material.SetColor("_TopColor", Color.yellow);
                     material.SetColor("_MiddleColor", Color.yellow);
-                    material.SetColor("_BottomColor", Color.yellow);
+                    material.SetColor("_BottomColor", Color.yellow);*/
                     //material.SetColor("_SpecColor", Color.yellow);
 
                     material.SetFloat(Shader.PropertyToID("_Gloss"), 3.5F);
                     material.SetFloat(Shader.PropertyToID("_GlossPower"), 6F);
-                    material.SetFloat(Shader.PropertyToID("_Shininess"), 2F);
+                    /*material.SetFloat(Shader.PropertyToID("_Shininess"), 2F);
                     material.SetFloat(Shader.PropertyToID("_CrackAmount"), 0);
-                    material.SetFloat(Shader.PropertyToID("_Char"), 0);
+                    material.SetFloat(Shader.PropertyToID("_Char"), 0);*/
 
                     slimeAppearanceStructure.DefaultMaterials[0] = material;
                 }
@@ -85,19 +85,19 @@ namespace Creators
 
             GameObject LOD0 = PrefabUtils.CopyPrefab(slimeAppearanceObjects[0].gameObject);
             LOD0.GetComponent<MeshFilter>().sharedMesh = customCrest;
-            /*LOD0.gameObject.transform.localPosition = new Vector3(0f, 1, 0.3f);
+            LOD0.gameObject.transform.localPosition = new Vector3(0f, 1, 0.3f);
             var transformLocalRotation = LOD0.transform.localRotation;
             transformLocalRotation.eulerAngles = new Vector3(30f, 0, 0);
-            LOD0.transform.localRotation = transformLocalRotation;*/
+            LOD0.transform.localRotation = transformLocalRotation;
 
             slimeAppearanceObjects[0] = LOD0.GetComponent<SlimeAppearanceObject>();
 
             GameObject LOD1 = PrefabUtils.CopyPrefab(slimeAppearanceObjects[1].gameObject);
             LOD1.GetComponent<MeshFilter>().sharedMesh = customCrest;
-            /*LOD1.gameObject.transform.localPosition = new Vector3(0f, 1, 0.3f);
+            LOD1.gameObject.transform.localPosition = new Vector3(0f, 1, 0.3f);
             var transformLocalRotation1 = LOD1.transform.localRotation;
             transformLocalRotation1.eulerAngles = new Vector3(30f, 0, 0);
-            LOD1.transform.localRotation = transformLocalRotation;*/
+            LOD1.transform.localRotation = transformLocalRotation;
 
             slimeAppearanceObjects[1] = LOD1.GetComponent<SlimeAppearanceObject>();
 
@@ -113,7 +113,7 @@ namespace Creators
             SlimeDefinition quickSilverDefinitionToUse = SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME);
             SlimeDefinition quickSilverDefinition = (SlimeDefinition)PrefabUtils.DeepCopyObject(quickSilverDefinitionToUse);
 
-            SlimeAppearance slimeShocked = Object.Instantiate(quickSilverDefinition.AppearancesDefault[0].ShockedAppearance);
+            /*SlimeAppearance slimeShocked = Object.Instantiate(quickSilverDefinition.AppearancesDefault[0].ShockedAppearance);
 
             slimeShocked.Structures = new SlimeAppearanceStructure[]
             {
@@ -122,7 +122,7 @@ namespace Creators
 
             slimeShocked.Structures[0].DefaultMaterials[0] = quickSilverDefinition.AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0];
 
-            slimeAppearance.ShockedAppearance = slimeShocked;
+            slimeAppearance.ShockedAppearance = slimeShocked;*/
 
             #endregion
 

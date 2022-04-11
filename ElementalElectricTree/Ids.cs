@@ -28,6 +28,8 @@ namespace ElementalElectricTree
         public static readonly ExchangeDirector.NonIdentReward REWARD_ELECTRIC_CONTAINER_UPGRADE;
 
         public static readonly Identifiable.Id ELECTRIC_CANNON_SHOT;
+
+        public static readonly ZoneDirector.Zone ELECTRIC_ISLAND;
     }
 }
 #pragma warning restore 0649

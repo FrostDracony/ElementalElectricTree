@@ -47,6 +47,9 @@
     <Reference Include="MoSecretStyles">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\SRML\Mods\MoSecretStyles.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="ShinySlimes, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Slime Rancher\SRML\Mods\ShinySlimes.dll</HintPath>
@@ -315,12 +318,15 @@
     <Compile Include="Creators\SlimeCreator.cs" />
     <Compile Include="Creators\SlimePrefabs\ElectricSlimeForm1.cs" />
     <Compile Include="Creators\SlimePrefabs\ElectricSlimeForm2.cs" />
+    <Compile Include="Creators\ZoneCreator.cs" />
+    <Compile Include="Creators\Zones\ElectricIsland.cs" />
     <Compile Include="Ids.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Other\Commands.cs" />
     <Compile Include="Other\ElectroMeter.cs" />
     <Compile Include="Other\HelperClass.cs" />
     <Compile Include="Other\LandPlotUpgradeRegistry.cs" />
+    <Compile Include="Other\Replacer.cs" />
     <Compile Include="Other\SRObjects.cs" />
     <Compile Include="Other\TextureUtils.cs" />
     <Compile Include="Other\Translations.cs" />
@@ -354,6 +360,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="electric_tree_slimes_2" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

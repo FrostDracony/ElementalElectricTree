@@ -12,8 +12,8 @@ using UnityEngine;
 using Creators;
 using ElementalElectricTree.Other;
 using ElementalElectricTree.Patches;
-using TranslationAPI;
 using MoSecretStyles;
+
 namespace ElementalElectricTree
 {
     public class Main : ModEntryPoint
@@ -58,14 +58,17 @@ namespace ElementalElectricTree
 
         public override void PreLoad()
         {
-            //Console.Log("Loading Electric");
+            Console.Log("PreLoading Electric");
+            Console.Log("1");
             PediaRegistry.RegisterIdentifiableMapping(Ids.FORM_2_ELECTRIC_SLIME_ENTRY, Ids.FORM_2_ELECTRIC_SLIME);
             PediaRegistry.SetPediaCategory(Ids.FORM_2_ELECTRIC_SLIME_ENTRY, PediaRegistry.PediaCategory.SLIMES);
 
+            ShortCutter.Log("2");
             PediaRegistry.RegisterIdentifiableMapping(Ids.ELECTRIC_SLIME_ENTRY, Ids.ELECTRIC_SLIME);
             PediaRegistry.SetPediaCategory(Ids.ELECTRIC_SLIME_ENTRY, PediaRegistry.PediaCategory.SLIMES);
 
 
+            Console.Log("3");
             PediaRegistry.RegisterIdentifiableMapping(PediaDirector.Id.PLORTS, Ids.ELECTRIC_PLORT);
             Identifiable.PLORT_CLASS.Add(Ids.ELECTRIC_PLORT);
             Identifiable.NON_SLIMES_CLASS.Add(Ids.ELECTRIC_PLORT);
@@ -83,6 +86,7 @@ namespace ElementalElectricTree
                 .SetPlortonomicsTranslation("???");*/
 
 
+            Console.Log("4");
             Console.RegisterCommand(new PrintComponentsCommand());
             Console.RegisterCommand(new PrintMaterialInfosCommand());
             Console.RegisterCommand(new PrintMaterialCommand());
@@ -90,11 +94,12 @@ namespace ElementalElectricTree
             Console.RegisterCommand(new PrintSlimeAppearanceContentCommand());
             Console.RegisterCommand(new PrintLODContent());
             Console.RegisterCommand(new PrintPlayerComponentsCommand());
+
+            Console.Log("5");
             SRML.LandPlotUpgradeRegistry.RegisterPlotUpgrader<ElectroMeter.Upgrade>(LandPlot.Id.CORRAL);
 
+            Console.Log("6");
             Translations.Translate();
-
-
 
             if (IsModLoaded("shinyslimes"))
             {
@@ -109,6 +114,13 @@ namespace ElementalElectricTree
 
         public override void Load()
         {
+
+            if (IsModLoaded("translationapi"))
+            {
+                ShortCutter.Log("TranslationAPI is loaded");
+                TranslationAPI.TranslationUtil.RegisterAssembly(Assembly.GetExecutingAssembly());
+            }
+
             if (IsModLoaded("mosecretstyles"))
             {
                 ShortCutter.Log("MORE SECRET STYLES");
@@ -116,24 +128,114 @@ namespace ElementalElectricTree
 
                 ModSecretStyle.onSecretStylesInitialization += () =>
                 {
+                    #region BLACK LIGHTNING
                     ShortCutter.Log("MORE SECRET STYLES STARTING");
                     Identifiable.Id Form1Id = Ids.ELECTRIC_SLIME;
                     ModSecretStyle modSecretStyle = new ModSecretStyle(Form1Id, new Vector3(83.18477f, 14.73f, -142.1283f), new Quaternion(), "cellRanch_Home", "podSSBlackLightning");
                     modSecretStyle.SecretStyle.NameXlateKey = "t.secret_style_electric_slime";
-                    TranslationPatcher.AddActorTranslation("t.secret_style_electric_slime", "Black Lightning");
-                    
-                    Material material = new Material(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
-                    material.name = "BLACK_THUNDERS";
 
+                    Material material = new Material(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
+                    Material whiteMaterial = new Material(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
+                    material.name = "BLACK_THUNDERS";
+                    whiteMaterial.name = "BRIGHT";
 
                     modSecretStyle.SecretStyle.Structures[0].DefaultMaterials[0] = material;
-                    modSecretStyle.SecretStyle.Structures[1].DefaultMaterials[0] = material;
+                    modSecretStyle.SecretStyle.Structures[1].DefaultMaterials[0] = whiteMaterial;
+
                     modSecretStyle.SecretStyle.Icon = assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
                     modSecretStyle.Definition.GetAppearanceForSet(SlimeAppearance.AppearanceSaveSet.CLASSIC).Icon = assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
-                    material.SetColor("_TopColor", Color.red);
-                    material.SetColor("_MiddleColor", Color.red);
-                    material.SetColor("_BottomColor", Color.red);
-                    material.SetColor("_GlowTop", Color.red);
+
+                    ShortCutter.Log("_Gloss" + material.GetFloat("_Gloss"));
+                    ShortCutter.Log("_GlossPower" + material.GetFloat("_GlossPower"));
+
+                    #region Modyfing Materials
+                    material.SetColor("_TopColor", new Color(0, 0, 0));
+                    material.SetColor("_MiddleColor", new Color(0, 0, 0));
+                    material.SetColor("_BottomColor", new Color(0, 0, 0));
+                    material.SetColor("_GlowTop", new Color(0, 0, 0));
+                    material.SetFloat("_GlossPower", 0.0f);
+                    material.SetFloat("_Gloss", 0.0f);
+
+                    whiteMaterial.SetColor("_TopColor", Color.white);
+                    whiteMaterial.SetColor("_MiddleColor", Color.white);
+                    whiteMaterial.SetColor("_BottomColor", Color.white);
+                    whiteMaterial.SetColor("_GlowTop", Color.white);
+                    #endregion
+
+                    #region Other Modifications
+                    modSecretStyle.SecretStyle.ColorPalette = new SlimeAppearance.Palette()
+                    {
+                        Bottom = Color.black,
+                        Top = Color.black,
+                        Middle = Color.black
+                    };
+                    #endregion
+                    #endregion
+
+
+
+                    #region OVERDRIVE
+
+                    ShortCutter.Log("Starting Form2");
+                    Identifiable.Id Form2Id = Ids.FORM_2_ELECTRIC_SLIME;
+                    ModSecretStyle modSecretStyleOverDrive = new ModSecretStyle(Form2Id, new Vector3(90f, 14.73f, -130.1283f), new Quaternion(), "cellRanch_Home", "podSSOverDrive");
+                    modSecretStyleOverDrive.SecretStyle.NameXlateKey = "t.secret_style_electric_slime_form_2";
+
+                    ShortCutter.Log("Material Part");
+                    Material overdriveMaterial = new Material(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
+                    overdriveMaterial.name = "OVERDRIVE";
+
+                    modSecretStyleOverDrive.SecretStyle.Structures[0].DefaultMaterials[0] = overdriveMaterial;
+
+
+                    /*SlimeAppearance slimeShocked = GameObject.Instantiate(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance);
+
+                    slimeShocked.Structures = new SlimeAppearanceStructure[]
+                    {
+                        modSecretStyleOverDrive.SecretStyle.Structures[0], modSecretStyleOverDrive.SecretStyle.Structures[1]
+                    };
+
+                    slimeShocked.Structures[0].DefaultMaterials[0] = SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0];
+
+                    modSecretStyleOverDrive.SecretStyle.ShockedAppearance = slimeShocked;*/
+
+
+                    ShortCutter.Log("Even more things");
+                    modSecretStyleOverDrive.SecretStyle.Icon = assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
+                    modSecretStyleOverDrive.Definition.GetAppearanceForSet(SlimeAppearance.AppearanceSaveSet.CLASSIC).Icon = assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
+
+                    ShortCutter.Log("_Gloss" + overdriveMaterial.GetFloat("_Gloss"));
+                    ShortCutter.Log("_GlossPower" + overdriveMaterial.GetFloat("_GlossPower"));
+
+                    #region Modyfing Materials
+                    overdriveMaterial.SetColor("_TopColor", Color.cyan);
+                    overdriveMaterial.SetColor("_MiddleColor", Color.cyan);
+                    overdriveMaterial.SetColor("_BottomColor", Color.cyan);
+                    ShortCutter.Log("First Colors set");
+
+
+                    overdriveMaterial.SetFloat(Shader.PropertyToID("_Gloss"), 3.5F);
+                    overdriveMaterial.SetFloat(Shader.PropertyToID("_GlossPower"), 6F);
+                    overdriveMaterial.SetFloat(Shader.PropertyToID("_Shininess"), 2F);
+                    overdriveMaterial.SetFloat(Shader.PropertyToID("_CrackAmount"), 0);
+                    overdriveMaterial.SetFloat(Shader.PropertyToID("_Char"), 0);
+
+                    ShortCutter.Log("material sets");
+
+                    #endregion
+
+                    #region Other Modifications
+                    ShortCutter.Log("Final");
+                    modSecretStyleOverDrive.SecretStyle.ColorPalette = new SlimeAppearance.Palette()
+                    {
+                        Bottom = Color.cyan,
+                        Top = Color.cyan,
+                        Middle = Color.cyan
+                    };
+                    ShortCutter.Log("Done");
+
+                    #endregion
+                    #endregion
 
                     ShortCutter.Log("Logging texture");
                     ShortCutter.Log(material.GetTexture(Shader.PropertyToID("_StripeTexture")));
@@ -173,11 +275,6 @@ namespace ElementalElectricTree
                 600,
                 8
             );
-
-            if (IsModLoaded("translationapi"))
-            {
-                TranslationUtil.RegisterAssembly(Assembly.GetExecutingAssembly());
-            }
 
             PediaRegistry.RegisterIdEntry(Ids.ELECTRIC_SLIME_ENTRY, assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite"));
             PediaRegistry.RegisterIdEntry(Ids.FORM_2_ELECTRIC_SLIME_ENTRY, assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite"));
