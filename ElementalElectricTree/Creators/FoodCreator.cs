@@ -5,11 +5,17 @@ using ElementalElectricTree;
 using UnityEngine;
 using SRML.SR;
 using SRML.Utils;
+using System.Linq;
 
 namespace Creators
 {
     static class Custom_Food_Creator
     {
+        public static void RegisterAllFoods()
+        {
+            RegisterFood(SlimeEat.FoodGroup.MEAT, CreateElectricHenPrefab(), Color.yellow, ((IEnumerable<PediaDirector.IdEntry>)SRSingleton<SceneContext>.Instance.PediaDirector.entries).First(x => x.id == PediaDirector.Id.HENHEN).icon);
+            RegisterFood(SlimeEat.FoodGroup.MEAT, CreateElectricRoosterPrefab(), Color.yellow, Main.assetBundle.LoadAsset<Sprite>("electricRoostro"));
+        }
         public static void RegisterFood(SlimeEat.FoodGroup foodGroup, GameObject gameObject, Color backGroundColor, Sprite icon, Identifiable.Id id = Identifiable.Id.NONE)
         {
             LookupRegistry.RegisterIdentifiablePrefab(gameObject);

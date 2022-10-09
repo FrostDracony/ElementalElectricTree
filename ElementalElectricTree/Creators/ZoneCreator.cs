@@ -83,11 +83,16 @@ namespace ElementalElectricTree.Creators
 
             return null;
         }
-        internal static void Load(GameObject Sector, string fileName)
+        internal static void Load(GameObject Sector, string file)
         {
-            var json = JsonConvert.DeserializeObject<Dictionary<ulong, MappingSave>>(File.ReadAllText(fileName));
+            var json = JsonConvert.DeserializeObject<Dictionary<ulong, MappingSave>>(file);
             foreach (var variable in json)
             {
+                ShortCutter.Log(variable.Value.Path);
+                ShortCutter.Log(variable.Value.Category);
+                if (variable.Value.Category == "Constructs" && variable.Value.Path == "zoneDESERT/cellDesert_WaystationTempleEndOutside/Sector/Constructs/UnderConstructionBarrier")
+                    continue;
+
                 if (variable.Value.AccessDoor)
                 {
                     GameObject VariableName = GameObjectUtils.InstantiateInactive(GameObject.Find(variable.Value.Path));

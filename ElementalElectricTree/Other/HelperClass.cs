@@ -26,7 +26,8 @@ namespace ElementalElectricTree.Other
             weaponVacuum.ShootEffect();
         }*/
 
-        public static void Log(object message) => Console.Log(message.ToString());
+        public static void Log(this object message) => Console.Log(message.ToString());
+        public static void Log(this string message) => Console.Log(message);
 
         public static GameObject FindChild(this GameObject @object, string childsName) => @object.transform.Find(childsName).gameObject;
 

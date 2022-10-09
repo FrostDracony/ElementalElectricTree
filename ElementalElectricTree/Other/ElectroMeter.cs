@@ -1,6 +1,7 @@
 ﻿using Creators;
 using UnityEngine;
 using SRML.Console;
+using ElementalElectricTree.Other;
 
 namespace ElementalElectricTree
 {
@@ -33,11 +34,15 @@ namespace ElementalElectricTree
                 mainImg = Main.assetBundle.LoadAsset<Sprite>("electricMeter"),
                 cost = 10000,
                 landplotPediaId = PediaDirector.Id.CORRAL,
-                isUnlocked = () => 
+                isUnlocked = plot => 
                 {
-                    Console.Log("Testing when it updates");
-                    //return SRSingleton<SceneContext>.Instance.ProgressDirector.HasProgress(ProgressDirector.ProgressType.UNLOCK_MOCHI_MISSIONS);
-                    return true;
+                    ("Progress with Mochi: " + SceneContext.Instance.ExchangeDirector.progressDir.GetProgress(SceneContext.Instance.ExchangeDirector.GetProgressEntry(ExchangeDirector.OfferType.MOCHI).progressType)).Log();
+                    if(SceneContext.Instance.ExchangeDirector.progressDir.GetProgress(SceneContext.Instance.ExchangeDirector.GetProgressEntry(ExchangeDirector.OfferType.MOCHI).progressType) == 4)
+                    {
+                        return true;
+                    }
+                        
+                    return false;
                 },
                 LandPlotName = "corral"
             };

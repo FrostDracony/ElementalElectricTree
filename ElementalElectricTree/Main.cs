@@ -12,6 +12,7 @@ using UnityEngine;
 using Creators;
 using ElementalElectricTree.Other;
 using ElementalElectricTree.Patches;
+using ElementalElectricTree.Creators;
 using MoSecretStyles;
 
 namespace ElementalElectricTree
@@ -21,6 +22,9 @@ namespace ElementalElectricTree
         static Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Main), "electric_tree_slimes");
         public static AssetBundle assetBundle = AssetBundle.LoadFromStream(manifestResourceStream);
 
+        static Stream assetsManifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Main), "electric_slime_assets");
+        public static AssetBundle AssetsAssetBundle = AssetBundle.LoadFromStream(assetsManifestResourceStream);
+
         static Stream newManifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Main), "electric_tree_slimes_2");
         public static AssetBundle newAssetBundle = AssetBundle.LoadFromStream(newManifestResourceStream);
 
@@ -28,7 +32,9 @@ namespace ElementalElectricTree
         static Stream manifestResourceStream2 = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Main), "special_electric_slimes");
         public static AssetBundle assetBundle2 = AssetBundle.LoadFromStream(manifestResourceStream2);
 
-        public static Dictionary<Identifiable.Id, Dictionary<SlimeDefinition, SlimeAppearance>> SecretStyleList = new Dictionary<Identifiable.Id, Dictionary<SlimeDefinition, SlimeAppearance>>();
+        //public static Stream manifestResourceStreamZones = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Main), "Electric_Canyon_withList.json");
+
+        public static Dictionary<Identifiable.Id, SlimeAppearance> SecretStyleList = new Dictionary<Identifiable.Id, SlimeAppearance>();
 
         public static Dictionary<string, GameObject> corralUpgradesModels = new Dictionary<string, GameObject>();
 
@@ -59,16 +65,13 @@ namespace ElementalElectricTree
         public override void PreLoad()
         {
             Console.Log("PreLoading Electric");
-            Console.Log("1");
+            Main.assetBundle.GetAllAssetNames().PrintContent();
             PediaRegistry.RegisterIdentifiableMapping(Ids.FORM_2_ELECTRIC_SLIME_ENTRY, Ids.FORM_2_ELECTRIC_SLIME);
             PediaRegistry.SetPediaCategory(Ids.FORM_2_ELECTRIC_SLIME_ENTRY, PediaRegistry.PediaCategory.SLIMES);
 
-            ShortCutter.Log("2");
             PediaRegistry.RegisterIdentifiableMapping(Ids.ELECTRIC_SLIME_ENTRY, Ids.ELECTRIC_SLIME);
             PediaRegistry.SetPediaCategory(Ids.ELECTRIC_SLIME_ENTRY, PediaRegistry.PediaCategory.SLIMES);
 
-
-            Console.Log("3");
             PediaRegistry.RegisterIdentifiableMapping(PediaDirector.Id.PLORTS, Ids.ELECTRIC_PLORT);
             Identifiable.PLORT_CLASS.Add(Ids.ELECTRIC_PLORT);
             Identifiable.NON_SLIMES_CLASS.Add(Ids.ELECTRIC_PLORT);
@@ -86,7 +89,6 @@ namespace ElementalElectricTree
                 .SetPlortonomicsTranslation("???");*/
 
 
-            Console.Log("4");
             Console.RegisterCommand(new PrintComponentsCommand());
             Console.RegisterCommand(new PrintMaterialInfosCommand());
             Console.RegisterCommand(new PrintMaterialCommand());
@@ -95,10 +97,8 @@ namespace ElementalElectricTree
             Console.RegisterCommand(new PrintLODContent());
             Console.RegisterCommand(new PrintPlayerComponentsCommand());
 
-            Console.Log("5");
-            SRML.LandPlotUpgradeRegistry.RegisterPlotUpgrader<ElectroMeter.Upgrade>(LandPlot.Id.CORRAL);
+            //SRML.LandPlotUpgradeRegistry.RegisterPlotUpgrader<ElectroMeter.Upgrade>(LandPlot.Id.CORRAL);
 
-            Console.Log("6");
             Translations.Translate();
 
             if (IsModLoaded("shinyslimes"))
@@ -107,6 +107,7 @@ namespace ElementalElectricTree
                 ShinySlime();
             }
 
+            LandPlotUpgradeRegistry.RegisterPurchasableUpgrade<CorralUI>(ElectroMeter.CreateElectricContainerEntry());
 
 
             HarmonyInstance.PatchAll();
@@ -114,13 +115,15 @@ namespace ElementalElectricTree
 
         public override void Load()
         {
-
+            #region Translation
             if (IsModLoaded("translationapi"))
             {
                 ShortCutter.Log("TranslationAPI is loaded");
                 TranslationAPI.TranslationUtil.RegisterAssembly(Assembly.GetExecutingAssembly());
             }
+            #endregion
 
+            #region SecretStyles
             if (IsModLoaded("mosecretstyles"))
             {
                 ShortCutter.Log("MORE SECRET STYLES");
@@ -131,9 +134,8 @@ namespace ElementalElectricTree
                     #region BLACK LIGHTNING
                     ShortCutter.Log("MORE SECRET STYLES STARTING");
                     Identifiable.Id Form1Id = Ids.ELECTRIC_SLIME;
-                    ModSecretStyle modSecretStyle = new ModSecretStyle(Form1Id, new Vector3(83.18477f, 14.73f, -142.1283f), new Quaternion(), "cellRanch_Home", "podSSBlackLightning");
+                    ModSecretStyle modSecretStyle = new ModSecretStyle(Form1Id, new Vector3(-146.9633f, 44.74749f, -948.8106f), new Quaternion(), "cellValley_RaceTrack2", "podSSBlackLightning");
                     modSecretStyle.SecretStyle.NameXlateKey = "t.secret_style_electric_slime";
-
                     Material material = new Material(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
                     Material whiteMaterial = new Material(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
                     material.name = "BLACK_THUNDERS";
@@ -142,8 +144,8 @@ namespace ElementalElectricTree
                     modSecretStyle.SecretStyle.Structures[0].DefaultMaterials[0] = material;
                     modSecretStyle.SecretStyle.Structures[1].DefaultMaterials[0] = whiteMaterial;
 
-                    modSecretStyle.SecretStyle.Icon = assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
-                    modSecretStyle.Definition.GetAppearanceForSet(SlimeAppearance.AppearanceSaveSet.CLASSIC).Icon = assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
+                    modSecretStyle.SecretStyle.Icon = AssetsAssetBundle.LoadAsset<Sprite>("SS_ElectricSlime");
+                    modSecretStyle.Definition.GetAppearanceForSet(SlimeAppearance.AppearanceSaveSet.CLASSIC).Icon = AssetsAssetBundle.LoadAsset<Sprite>("ElectricSlime");
 
                     ShortCutter.Log("_Gloss" + material.GetFloat("_Gloss"));
                     ShortCutter.Log("_GlossPower" + material.GetFloat("_GlossPower"));
@@ -178,7 +180,7 @@ namespace ElementalElectricTree
 
                     ShortCutter.Log("Starting Form2");
                     Identifiable.Id Form2Id = Ids.FORM_2_ELECTRIC_SLIME;
-                    ModSecretStyle modSecretStyleOverDrive = new ModSecretStyle(Form2Id, new Vector3(90f, 14.73f, -130.1283f), new Quaternion(), "cellRanch_Home", "podSSOverDrive");
+                    ModSecretStyle modSecretStyleOverDrive = new ModSecretStyle(Form2Id, new Vector3(-156.8036f, 38.16051f, -891.7065f), new Quaternion(), "cellValley_RaceTrack2", "podSSOverDrive");
                     modSecretStyleOverDrive.SecretStyle.NameXlateKey = "t.secret_style_electric_slime_form_2";
 
                     ShortCutter.Log("Material Part");
@@ -187,22 +189,9 @@ namespace ElementalElectricTree
 
                     modSecretStyleOverDrive.SecretStyle.Structures[0].DefaultMaterials[0] = overdriveMaterial;
 
-
-                    /*SlimeAppearance slimeShocked = GameObject.Instantiate(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance);
-
-                    slimeShocked.Structures = new SlimeAppearanceStructure[]
-                    {
-                        modSecretStyleOverDrive.SecretStyle.Structures[0], modSecretStyleOverDrive.SecretStyle.Structures[1]
-                    };
-
-                    slimeShocked.Structures[0].DefaultMaterials[0] = SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0];
-
-                    modSecretStyleOverDrive.SecretStyle.ShockedAppearance = slimeShocked;*/
-
-
                     ShortCutter.Log("Even more things");
-                    modSecretStyleOverDrive.SecretStyle.Icon = assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
-                    modSecretStyleOverDrive.Definition.GetAppearanceForSet(SlimeAppearance.AppearanceSaveSet.CLASSIC).Icon = assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite");
+                    modSecretStyleOverDrive.SecretStyle.Icon = AssetsAssetBundle.LoadAsset<Sprite>("Overcharged");
+                    modSecretStyleOverDrive.Definition.GetAppearanceForSet(SlimeAppearance.AppearanceSaveSet.CLASSIC).Icon = AssetsAssetBundle.LoadAsset<Sprite>("Form2ElectricSlime");
 
                     ShortCutter.Log("_Gloss" + overdriveMaterial.GetFloat("_Gloss"));
                     ShortCutter.Log("_GlossPower" + overdriveMaterial.GetFloat("_GlossPower"));
@@ -212,13 +201,6 @@ namespace ElementalElectricTree
                     overdriveMaterial.SetColor("_MiddleColor", Color.cyan);
                     overdriveMaterial.SetColor("_BottomColor", Color.cyan);
                     ShortCutter.Log("First Colors set");
-
-
-                    overdriveMaterial.SetFloat(Shader.PropertyToID("_Gloss"), 3.5F);
-                    overdriveMaterial.SetFloat(Shader.PropertyToID("_GlossPower"), 6F);
-                    overdriveMaterial.SetFloat(Shader.PropertyToID("_Shininess"), 2F);
-                    overdriveMaterial.SetFloat(Shader.PropertyToID("_CrackAmount"), 0);
-                    overdriveMaterial.SetFloat(Shader.PropertyToID("_Char"), 0);
 
                     ShortCutter.Log("material sets");
 
@@ -240,63 +222,69 @@ namespace ElementalElectricTree
                     ShortCutter.Log("Logging texture");
                     ShortCutter.Log(material.GetTexture(Shader.PropertyToID("_StripeTexture")));
                 };
-            }
 
+            }
+            #endregion
+
+            #region Registering Ammo
             AmmoRegistry.RegisterAmmoPrefab(PlayerState.AmmoMode.DEFAULT, SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_4));
             AmmoRegistry.RegisterAmmoPrefab(PlayerState.AmmoMode.DEFAULT, SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_2));
             AmmoRegistry.RegisterAmmoPrefab(PlayerState.AmmoMode.DEFAULT, SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1));
             AmmoRegistry.RegisterAmmoPrefab(PlayerState.AmmoMode.DEFAULT, SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_3));
+            #endregion
 
+            //Without this, no electric slimes (needed to check when gold slime, quicksilver and valley shots collide
             GameObject goldSlime = SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.GOLD_SLIME);
-
             goldSlime.AddComponent<ReactToShock>().GetCopyOf(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.QUICKSILVER_SLIME).GetComponentInChildren<ReactToShock>());
 
+            #region Making Stuff Vaccable
             SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_4).AddComponent<ElectricSlimeCreator>();
             SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_3).AddComponent<ElectricSlimeCreator>();
             SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_2).AddComponent<ElectricSlimeCreator>();
             SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Identifiable.Id.VALLEY_AMMO_1).AddComponent<ElectricSlimeCreator>();
+            #endregion
 
-            Custom_Slime_Creator.RegisterSlime(ElectricSlimeForm1Prefab.GetPrefab());
-            Custom_Slime_Creator.RegisterSlime(ElectricSlimeForm2Prefab.GetPrefab());
-            Custom_Slime_Creator.RegisterSlime(Custom_Slime_Creator.CreatPlasmaSlimePrefab());
+            #region Registering Slims
+            Custom_Slime_Creator.RegisteringAllSlimes();
+            #endregion
 
-            Custom_Food_Creator.RegisterFood(SlimeEat.FoodGroup.MEAT, Custom_Food_Creator.CreateElectricHenPrefab(), Color.yellow, ((IEnumerable<PediaDirector.IdEntry>)SRSingleton<SceneContext>.Instance.PediaDirector.entries).First<PediaDirector.IdEntry>((Func<PediaDirector.IdEntry, bool>)(x => x.id == PediaDirector.Id.HENHEN)).icon);
-            Custom_Food_Creator.RegisterFood(SlimeEat.FoodGroup.MEAT, Custom_Food_Creator.CreateElectricRoosterPrefab(), Color.yellow, assetBundle.LoadAsset<Sprite>("electricRoostro"));
+            #region Registering Foods
+            Custom_Food_Creator.RegisterAllFoods();
+            #endregion
 
-            Custom_Plort_Creator.RegisterPlort(
+            #region Registering Plorts
+            Custom_Plort_Creator.RegisterAllPlorts();
+            #endregion
 
-                Custom_Plort_Creator.CreateElectricPlortPrefab(
-                    "electricPlort",
-                    Ids.ELECTRIC_PLORT,
-                    Identifiable.Id.QUICKSILVER_PLORT),
-
-                assetBundle.LoadAsset<Sprite>("ElectricPlorts"),
-                Color.yellow,
-                600,
-                8
-            );
-
-            PediaRegistry.RegisterIdEntry(Ids.ELECTRIC_SLIME_ENTRY, assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite"));
-            PediaRegistry.RegisterIdEntry(Ids.FORM_2_ELECTRIC_SLIME_ENTRY, assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite"));
+            PediaRegistry.RegisterIdEntry(Ids.ELECTRIC_SLIME_ENTRY, AssetsAssetBundle.LoadAsset<Sprite>("ElectricSlime"));
+            PediaRegistry.RegisterIdEntry(Ids.FORM_2_ELECTRIC_SLIME_ENTRY, AssetsAssetBundle.LoadAsset<Sprite>("Form2ElectricSlime"));
             PediaRegistry.RegisterIdEntry(Ids.PLASMA_SLIME_ENTRY, assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite"));
 
             assetBundle.GetAllAssetNames().PrintContent<string>();
             assetBundle2.GetAllAssetNames().PrintContent<string>();
             newAssetBundle.GetAllAssetNames().PrintContent<string>();
-
-            SRML.LandPlotUpgradeRegistry.RegisterPurchasableUpgrade<CorralUI>(ElectroMeter.CreateElectricContainerEntry());
         }
 
         public override void PostLoad()
         {
             SRCallbacks.OnSaveGameLoaded += SRCallbacks_OnSaveGameLoaded;
+            SRCallbacks.PreSaveGameLoad += SRCallbacks_PreSaveGameLoad;
+        }
+
+        private void SRCallbacks_PreSaveGameLoad(SceneContext t)
+        {
+            #region Creating Zones
+            ElectricCanyon.Create();
+            #endregion
         }
 
         private void SRCallbacks_OnSaveGameLoaded(SceneContext t)
         {
+
             if (SceneContext.Instance.Player.GetComponent<Effects>() == null)
                 SceneContext.Instance.Player.AddComponent<Effects>();
 
+            #region Changing Mochi's RewardLevels
             ExchangeDirector exchangeDirector = SRSingleton<SceneContext>.Instance.ExchangeDirector;
             ExchangeDirector.ProgressOfferEntry progressOfferEntry1 = exchangeDirector.progressOffers[1];
             progressOfferEntry1.rewardLevels[0].requestedItem = Identifiable.Id.PINK_SLIME;
@@ -308,8 +296,10 @@ namespace ElementalElectricTree
             progressOfferEntry1.rewardLevels[2].requestedItem = Identifiable.Id.PINK_SLIME;
             progressOfferEntry1.rewardLevels[2].count = 1;
 
-            Array.Resize(ref progressOfferEntry1.rewardLevels, 4);
+            Array.Resize(ref progressOfferEntry1.rewardLevels, progressOfferEntry1.rewardLevels.Length + 1);
+            #endregion
 
+            #region Conversations
             RancherChatMetadata.Entry[] introConversation = exchangeDirector.CreateRancherChatConversation("mochi",
                 new string[]
                 {
@@ -358,7 +348,7 @@ namespace ElementalElectricTree
                     "Well, great Job.", 
                     "As promised, I was able to make a machine that would be able to limit the powers of the electric slimes.",
                     "I'd say I did everything alone, but...",
-                    "I needed the help of Thora (I'm not joking).",
+                    "I needed the help of Thora.",
                     "Yes, the old lady, she gave me a part of her knowledge and, oh gosh, Viktor would jaleaous if he'd see what I learned.",
                     "I now need to take a break, all that job exhausted me.",
                     "Nevertheless, you should go to talking to her next time there is a problem.",
@@ -379,6 +369,7 @@ namespace ElementalElectricTree
                     SRObjects.Get<Sprite>("mochi_sad1"),
                     SRObjects.Get<Sprite>("mochi_sad2"),
                 });
+            #endregion
 
             RancherChatMetadata rancherChatMetadataIntro = ScriptableObject.CreateInstance<RancherChatMetadata>();
             rancherChatMetadataIntro.entries = introConversation;

@@ -34,7 +34,7 @@ namespace Creators
                     Ids.ELECTRIC_ROOSTER
 
                 },
-                Main.assetBundle.LoadAsset<Sprite>("ElectricSlimeSprite"),
+                Main.AssetsAssetBundle.LoadAsset<Sprite>("ElectricSlime"),
                 new SlimeAppearance.Palette
                 {
                     Top = Color.yellow,
@@ -65,8 +65,8 @@ namespace Creators
             foreach (SlimeAppearanceStructure slimeAppearanceStructure in structures)
             {
                 Material[] defaultMaterials = slimeAppearanceStructure.DefaultMaterials;
-                Material material = SRML.SRObjects.GetInst<Material>("slimeQuickSilverBase");
-                Material goldMaterial = Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.GOLD_SLIME).AppearancesDefault[0].Structures[0].DefaultMaterials[0]);
+                //Material material = SRML.SRObjects.GetInst<Material>("slimeQuickSilverBase");
+                Material material = new Material(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
 
                 Console.Log("Printing thing: " + i);
 
@@ -166,7 +166,7 @@ namespace Creators
 
             #region SecretStyle
             SlimeAppearance secretAppearance = (SlimeAppearance)PrefabUtils.DeepCopyObject(slimeAppearance);
-
+            Main.SecretStyleList.Add(Ids.ELECTRIC_SLIME, secretAppearance);
             //ShortCutter.RegisterSecretStyle(Ids.ELECTRIC_SLIME, secretAppearance, slimeDefinition, "Black Lightning");
 
             #endregion

@@ -10,6 +10,13 @@ namespace Creators
 {
     class Custom_Slime_Creator
     {
+        public static void RegisteringAllSlimes()
+        {
+            RegisterSlime(ElectricSlimeForm1Prefab.GetPrefab());
+            RegisterSlime(ElectricSlimeForm2Prefab.GetPrefab());
+            RegisterSlime(CreatPlasmaSlimePrefab());
+        }
+
         public static void RegisterSlime((SlimeDefinition, GameObject) Tuple)
         {
 

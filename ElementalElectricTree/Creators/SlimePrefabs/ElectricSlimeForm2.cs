@@ -30,7 +30,7 @@ namespace Creators
                     Ids.ELECTRIC_ROOSTER
 
                 },
-                Main.assetBundle.LoadAsset<Sprite>("PlasmaSlime"),
+                Main.AssetsAssetBundle.LoadAsset<Sprite>("Form2ElectricSlime"),
                 new SlimeAppearance.Palette
                 {
                     Top = Color.yellow,
@@ -46,29 +46,10 @@ namespace Creators
             SlimeAppearance slimeAppearance = slimeObject.GetComponent<SlimeAppearanceApplicator>().Appearance;
 
             SlimeAppearanceStructure[] structures = slimeAppearance.Structures;
-            
-            Material material = Object.Instantiate(SRSingleton<GameContext>.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
 
-            foreach (SlimeAppearanceStructure slimeAppearanceStructure in structures)
-            {
-                Material[] defaultMaterials = slimeAppearanceStructure.DefaultMaterials;
-                if (defaultMaterials != null && defaultMaterials.Length != 0)
-                {
-                    /*material.SetColor("_TopColor", Color.yellow);
-                    material.SetColor("_MiddleColor", Color.yellow);
-                    material.SetColor("_BottomColor", Color.yellow);*/
-                    //material.SetColor("_SpecColor", Color.yellow);
-
-                    material.SetFloat(Shader.PropertyToID("_Gloss"), 3.5F);
-                    material.SetFloat(Shader.PropertyToID("_GlossPower"), 6F);
-                    /*material.SetFloat(Shader.PropertyToID("_Shininess"), 2F);
-                    material.SetFloat(Shader.PropertyToID("_CrackAmount"), 0);
-                    material.SetFloat(Shader.PropertyToID("_Char"), 0);*/
-
-                    slimeAppearanceStructure.DefaultMaterials[0] = material;
-                }
-
-            }
+            Material material = new Material(SceneContext.Instance.SlimeAppearanceDirector.SlimeDefinitions.GetSlimeByIdentifiableId(Identifiable.Id.QUICKSILVER_SLIME).AppearancesDefault[0].ShockedAppearance.Structures[0].DefaultMaterials[0]);
+            structures[0].DefaultMaterials[0] = material;
+            int i = 0; //1 = Body, 2 = crest
 
             slimeAppearance.Face.OnEnable();
 

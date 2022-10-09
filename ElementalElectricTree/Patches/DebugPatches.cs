@@ -34,43 +34,6 @@ namespace ElementalElectricTree.Patches
         }
     }
 
-    /*[HarmonyPatch(typeof(SlimeSubbehaviourPlexer), "RegistryFixedUpdate")]
-    class DebugPatchesV2
-    {
-        public static bool Prefix(SlimeSubbehaviourPlexer __instance)
-        {
-            
-            return true;
-        }
-    }*/
-
-/*    [HarmonyPatch(typeof(Shinies.ShinySpawn), "ShinyCheck")]
-    class DebugPatchesV2
-    {
-        public static bool Prefix(Shinies.ShinySpawn __instance, ref Shinies.ShinySpawn.Skin __result)
-        {
-            if (Main.IsModLoaded("shinyslimes"))
-            {
-                Identifiable.Id id = Identifiable.GetId(__instance.gameObject);
-
-                if (id == Ids.ELECTRIC_SLIME || id == Ids.FORM_2_ELECTRIC_SLIME)
-                {
-                    int num = UnityEngine.Random.Range(1, 1);
-                    bool flag = num == 1;
-                    Shinies.ShinySpawn.Skin result = Shinies.ShinySpawn.Skin.Normal;
-                    if (flag)
-                    {
-                        result = Shinies.ShinySpawn.Skin.Shiny;
-                    }
-
-                    __result = result;
-                    return false;
-                }
-            }
-            return true;
-        }
-    }*/
-
     [HarmonyPatch(typeof(WeaponVacuum), "ExpelAmmo")]
     class DebugPatchesV1
     {
@@ -92,115 +55,6 @@ namespace ElementalElectricTree.Patches
             __instance.ShootEffect();
 
             return false;
-        }
-    }
-
-    /*[HarmonyPatch(typeof(WeaponVacuum), "Expel", new Type[] { typeof(GameObject), typeof(bool) })]
-    unsafe class DebugPatches1
-    {
-        unsafe public static bool Prefix(WeaponVacuum __instance, GameObject toExpel, bool ignoreEmotions)
-        {
-            ///gameObject.PrintComponent();
-            Console.Log(toExpel.name + " was shooted!");
-            if (toExpel.name == "electricSlimeForm1" || toExpel.name == "electricSlimeForm2")
-            {
-                float GetSpeed(Identifiable.Id localId)
-                {
-                    if (localId - Identifiable.Id.VALLEY_AMMO_1 <= 3)
-                    {
-                        return __instance.ejectSpeed * 3f;
-                    }
-                    return __instance.ejectSpeed;
-                }
-
-                vp_FPController componentInParent = __instance.GetComponentInParent<vp_FPController>();
-                Ray ray = new Ray(__instance.vacOrigin.transform.position, __instance.vacOrigin.transform.up);
-                float num = PhysicsUtil.RadiusOfObject(toExpel);
-                float num2 = (ray.direction.y >= 0f) ? 0f : (-0.5f * ray.direction.y);
-                Vector3 vector = ray.origin + ray.direction * (num * 0.2f + num2);
-                Vector3 velocity = ray.direction * GetSpeed(__instance.GetPrivateField<PlayerState>("player").Ammo.GetSelectedId()) + componentInParent.Velocity;
-                vector = HelperClass.EnsureNotShootingIntoRock(vector, ray, num, ref velocity);
-                GameObject gameObject = SRBehaviour.InstantiateActor(toExpel, __instance.GetPrivateField<RegionRegistry>("regionRegistry").GetCurrentRegionSetId(), vector, Quaternion.identity, false);
-                gameObject.transform.LookAt(__instance.transform);
-                PhysicsUtil.RestoreFreezeRotationConstraints(gameObject);
-                SlimeEmotions component = gameObject.GetComponent<SlimeEmotions>();
-                if (component != null && __instance.GetPrivateField<PlayerState>("player").Ammo.GetSelectedId() != Identifiable.Id.NONE && !ignoreEmotions)
-                {
-                    component.SetAll(__instance.GetPrivateField<PlayerState>("player").Ammo.GetSelectedEmotions());
-                }
-                gameObject.GetComponent<Rigidbody>().velocity = velocity;
-                gameObject.transform.DOScale(gameObject.transform.localScale, 0.1f).From(gameObject.transform.localScale * 0.2f, true).SetEase(Ease.Linear);
-                gameObject.GetComponent<Vacuumable>().Launch(Vacuumable.LaunchSource.PLAYER);
-
-                Console.Log(__instance.GetPrivateField<RegionRegistry>("regionRegistry").GetCurrentRegionSetId().ToString());
-
-                if (__instance.GetPrivateField<RegionRegistry>("regionRegistry").GetCurrentRegionSetId() == RegionRegistry.RegionSetId.VALLEY)
-                {
-                    Console.Log("YES");
-                    if(toExpel.name == "electricSlimeForm2")
-                    {
-                        Console.Log("electricSlimeForm2 -> electricSlimeForm1");
-                        GameObject newSlime = SRBehaviour.InstantiateActor(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.ELECTRIC_SLIME), __instance.GetPrivateField<RegionRegistry>("regionRegistry").GetCurrentRegionSetId(), vector, Quaternion.identity, false);
-                        Console.Log("newSlime: " + newSlime);
-                        newSlime.transform.LookAt(__instance.transform);
-                        PhysicsUtil.RestoreFreezeRotationConstraints(newSlime);
-                        SlimeEmotions slimeEmotions = newSlime.GetComponent<SlimeEmotions>();
-                        if (slimeEmotions != null && __instance.GetPrivateField<PlayerState>("player").Ammo.GetSelectedId() != Identifiable.Id.NONE && !ignoreEmotions)
-                        {
-                            slimeEmotions.SetAll(__instance.GetPrivateField<PlayerState>("player").Ammo.GetSelectedEmotions());
-                        }
-                        newSlime.GetComponent<Rigidbody>().velocity = velocity;
-                        newSlime.transform.DOScale(newSlime.transform.localScale, 0.1f).From(newSlime.transform.localScale * 0.2f, true).SetEase(Ease.Linear);
-                        newSlime.GetComponent<Vacuumable>().Launch(Vacuumable.LaunchSource.PLAYER);
-                        GameObject.Destroy(gameObject);
-                    }
-                    *//*if (gameObject.GetComponent<switchSlimeForm>() == null)
-                        gameObject.AddComponent<switchSlimeForm>();
-                    gameObject.GetComponent<switchSlimeForm>().idOfSlime = Ids.ELECTRIC_SLIME;
-                    gameObject.GetComponent<switchSlimeForm>().switchToForm1();*//*
-                }
-                else
-                {
-                    Console.Log("NO");
-                    if (toExpel.name == "electricSlimeForm1")
-                    {
-                        Console.Log("electricSlimeForm1 -> electricSlimeForm2");
-                        GameObject newSlime = SRBehaviour.InstantiateActor(SRSingleton<GameContext>.Instance.LookupDirector.GetPrefab(Ids.FORM_2_ELECTRIC_SLIME), __instance.GetPrivateField<RegionRegistry>("regionRegistry").GetCurrentRegionSetId(), vector, Quaternion.identity, false);
-                        Console.Log("newSlime: " + newSlime);
-                        newSlime.transform.LookAt(__instance.transform);
-                        PhysicsUtil.RestoreFreezeRotationConstraints(newSlime);
-                        SlimeEmotions slimeEmotions = newSlime.GetComponent<SlimeEmotions>();
-                        if (slimeEmotions != null && __instance.GetPrivateField<PlayerState>("player").Ammo.GetSelectedId() != Identifiable.Id.NONE && !ignoreEmotions)
-                        {
-                            slimeEmotions.SetAll(__instance.GetPrivateField<PlayerState>("player").Ammo.GetSelectedEmotions());
-                        }
-                        newSlime.GetComponent<Rigidbody>().velocity = velocity;
-                        newSlime.transform.DOScale(newSlime.transform.localScale, 0.1f).From(newSlime.transform.localScale * 0.2f, true).SetEase(Ease.Linear);
-                        newSlime.GetComponent<Vacuumable>().Launch(Vacuumable.LaunchSource.PLAYER);
-                        GameObject.Destroy(gameObject);
-                    }
-
-
-                    *//*if (gameObject.GetComponent<switchSlimeForm>() == null)
-                        gameObject.AddComponent<switchSlimeForm>();
-                    gameObject.GetComponent<switchSlimeForm>().idOfSlime = Ids.FORM_2_ELECTRIC_SLIME;
-                    gameObject.GetComponent<switchSlimeForm>().switchToForm2();*//*
-                }
-                return false;
-            }
-            return true;
-        }
-    }*/
-
-    [HarmonyPatch(typeof(SolarShieldUpgrader), "Apply")]
-    class DebugPatches2
-    {
-        public static void Postfix(SolarShieldUpgrader __instance)
-        {
-            foreach(GameObject gameObject in __instance.shields)
-            {
-                Console.Log((gameObject.scene.name.Equals(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name).ToString()));
-            }
         }
     }
 
@@ -226,11 +80,6 @@ namespace ElementalElectricTree.Patches
     {
         public static bool Prefix(ExchangeRewardItemEntryUI __instance, ExchangeDirector.ItemEntry entry)
         {
-            //Console.Log("ExchangeRewardItemEntryUI.SetEntry Patch with entry being: " + (entry = null));
-            /*Console.Log("entry: " + (entry = null));
-            Console.Log("gameObject is: " + __instance.gameObject);
-            Console.Log("Ok, everything ok here 1");*/
-             
             if (entry == null)
             {
                 __instance.gameObject.SetActive(false);
@@ -461,22 +310,24 @@ namespace ElementalElectricTree.Patches
         }
     }
 
-    [HarmonyPatch(typeof(RancherProgressAwarder), "DoAward")]
+    /*[HarmonyPatch(typeof(RancherProgressAwarder), "DoAward")]
     class DebugPatches8
     {
         public static void Postfix(RancherProgressAwarder __instance)
         {
-            Console.Log("RancherProgressAwarder Patch");
-            Console.Log(__instance.offerType + " Quest Resetted");
-            if(__instance.offerType == ExchangeDirector.OfferType.MOCHI && SceneContext.Instance.ProgressDirector.GetProgress(__instance.progressType) >= 3)
+            *//*("RancherProgressAwarder Patch").Log();
+            (__instance.offerType + " Quest Resetted").Log();*//*
+            if(__instance.offerType == ExchangeDirector.OfferType.MOCHI && SceneContext.Instance.ProgressDirector.GetProgress(__instance.progressType) == 4)
             {
+                *//*("Is This the error?").Log();
                 SlimeDefinition slimeDefinition = GameContext.Instance.SlimeDefinitions.GetSlimeByIdentifiableId(Ids.ELECTRIC_SLIME);
-                SlimeAppearance secretAppearance = Main.SecretStyleList[Ids.ELECTRIC_SLIME].Get(slimeDefinition);
-
-                SceneContext.Instance.SlimeAppearanceDirector.UnlockAppearance(slimeDefinition, secretAppearance);
+                ("Or this?").Log();
+                SlimeAppearance secretAppearance = Main.SecretStyleList[Ids.ELECTRIC_SLIME];
+                ("Or this this?").Log();
+                SceneContext.Instance.SlimeAppearanceDirector.UnlockAppearance(slimeDefinition, secretAppearance);*//*
             }
         }
-    }
+    }*/
 
     /*[HarmonyPatch(typeof(ExchangeDirector), "Awake")]
     class DebugPatches9

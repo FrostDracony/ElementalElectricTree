@@ -261,8 +261,6 @@ namespace Creators
 						Shot.transform.DOScale(Shot.transform.localScale, 0.1f).From(Shot.transform.localScale * 0.2f, true).SetEase(Ease.Linear);
 					}
 
-					Console.Log("timeBtwCannonShots: " + timeBtwCannonShots);
-
 					if (timeBtwCannonShots <= 0)
 					{
 						if (canShoot)
@@ -795,7 +793,6 @@ namespace Creators
 
 		public void OnDisable()
         {
-			Console.Log("Time to disable");
 			foreach(GameObject gameObject in gameObjects)
             {
 				if(gameObject.GetComponent<Identifiable>().id == Ids.ELECTRIC_SLIME)
@@ -814,8 +811,6 @@ namespace Creators
 		public void OnTriggerEnter(Collider slime)
         {
 			Identifiable.Id id = Identifiable.Id.NONE;
-
-			Console.Log("OnEnter: collider is: " + slime.gameObject);
 
 			if (slime.gameObject.GetComponent<Identifiable>() != null)
             {
@@ -836,7 +831,6 @@ namespace Creators
 		{
 			Identifiable.Id id = Identifiable.Id.NONE;
 
-			Console.Log("OnExit: collider is: " + slime.gameObject);
 			
 			if (slime.gameObject.GetComponent<Identifiable>() != null)
 			{

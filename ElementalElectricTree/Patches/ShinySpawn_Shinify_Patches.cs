@@ -9,9 +9,9 @@ namespace ElementalElectricTree.Patches
         {
             if( __instance.gameObject.GetComponent<Identifiable>().id == Ids.ELECTRIC_SLIME)
             {
-                __instance.SetPrivateField("curMid", Color.cyan);
-                __instance.SetPrivateField("curTop", Color.cyan);
-                __instance.SetPrivateField("curBot", Color.cyan);
+                __instance.SetPrivateField("curMid", Color.white);
+                __instance.SetPrivateField("curTop", Color.white);
+                __instance.SetPrivateField("curBot", Color.white);
                 __instance.SetPrivateField("curColor", __instance.GetPrivateField<Color>("curTop"));
 
                 __instance.SetColors();
@@ -19,9 +19,9 @@ namespace ElementalElectricTree.Patches
 
             if (__instance.gameObject.GetComponent<Identifiable>().id == Ids.FORM_2_ELECTRIC_SLIME)
             {
-                __instance.SetPrivateField("curMid", Color.magenta);
-                __instance.SetPrivateField("curTop", Color.magenta);
-                __instance.SetPrivateField("curBot", Color.magenta);
+                __instance.SetPrivateField("curMid", Color.green);
+                __instance.SetPrivateField("curTop", Color.green);
+                __instance.SetPrivateField("curBot", Color.green);
                 __instance.SetPrivateField("curColor", __instance.GetPrivateField<Color>("curTop"));
 
                 __instance.SetColors();

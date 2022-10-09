@@ -8,6 +8,21 @@ namespace Creators
 {
     static class Custom_Plort_Creator
     {
+        public static void RegisterAllPlorts()
+        {
+            RegisterPlort(
+
+                Custom_Plort_Creator.CreateElectricPlortPrefab(
+                    "electricPlort",
+                    Ids.ELECTRIC_PLORT,
+                    Identifiable.Id.QUICKSILVER_PLORT),
+
+                Main.assetBundle.LoadAsset<Sprite>("ElectricPlorts"),
+                Color.yellow,
+                600,
+                8
+            );
+        }
         unsafe public static void RegisterPlort(GameObject plort, Sprite icon, Color backGroundColor, int price, int saturation)
         {
             Identifiable.Id id = plort.GetComponent<Identifiable>().id;

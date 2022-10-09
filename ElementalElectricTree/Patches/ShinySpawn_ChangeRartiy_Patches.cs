@@ -12,7 +12,7 @@ namespace ElementalElectricTree.Patches
 
             if (id == Ids.ELECTRIC_SLIME || id == Ids.FORM_2_ELECTRIC_SLIME)
             {
-                int num = Random.Range(1, 10);
+                int num = Random.Range(1, 4);
                 bool flag = num == 1;
                 ShinySpawn.Skin result = ShinySpawn.Skin.Normal;
                 if (flag)
